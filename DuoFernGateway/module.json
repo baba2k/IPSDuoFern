@@ -1,0 +1,20 @@
+{
+	"id": "{7AB07511-BABA-418B-81C5-88A7C709D318}",
+	"name": "DuoFernGateway",
+	"type": 2,
+	"vendor": "",
+	"aliases": [
+		"DuoFern Gateway"
+	],
+	"parentRequirements": [
+		"{79827379-F36E-4ADA-8A95-5F8D1DC92FA9}"
+	],
+	"childRequirements": [
+		"{15FD9630-BABA-4BCB-90E4-7DE815ECB79D}"
+	],
+	"implemented": [
+		"{018EF6B5-AB94-40C6-AA53-46943E824ACF}",
+		"{D608631B-BABA-4D08-ADB0-5364DD6A2526}"
+	],
+	"prefix": "DUOFERN"
+}

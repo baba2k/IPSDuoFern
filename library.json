@@ -1,0 +1,18 @@
+{
+	"id": "{610F4624-BABA-4B0B-BFA3-B71677D35426}",
+	"author": "Sebastian Leicht",
+	"name": "IPSDuoFern Library",
+	"url": "https://github.com/baba2k/IPSDuoFern",
+	"version": "0.1",
+	"build": 0,
+	"date": 1493589500,
+	"title": "Rademacher DuoFern",
+	"description": "Ermöglich die Anbindung des Rademacher DuoFern USB-Stick vom Typ 9495-UW ohne HomePilot.",
+	"tags": [
+		"Rademacher",
+		"DuoFern",
+		"9495-UW",
+		"HomePilot"
+	],
+	"req_ips_version": "4.2"
+}

@@ -1,0 +1,17 @@
+{
+	"id": "{0C742EC0-BABA-42EA-886D-AF09D45BA80F}",
+	"name": "DuoFernConfigurator",
+	"type": 4,
+	"vendor": "",
+	"aliases": [
+		"DuoFern Configurator"
+	],
+	"parentRequirements": [
+		"{D608631B-BABA-4D08-ADB0-5364DD6A2526}"
+	],
+	"childRequirements": [],
+	"implemented": [
+		"{15FD9630-BABA-4BCB-90E4-7DE815ECB79D}"
+	],
+	"prefix": "DUOFERN"
+}
