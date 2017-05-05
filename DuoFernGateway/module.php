@@ -17,7 +17,6 @@ class DuoFernGateway extends IPSModule {
 		
 		// register status variables
 		$this->RegisterVariableString ( "DuoFernCode", "DuoFern Code" );
-		$this->DisableAction ( "DuoFernCode" );
 	}
 	public function ApplyChanges() {
 		parent::ApplyChanges ();
@@ -42,8 +41,9 @@ class DuoFernGateway extends IPSModule {
 		}
 		
 		// set duo fern code status variable
-		if ($duoFernCode !== GetValueString ( $this->GetIDForIdent ( "DuoFernCode" ) )) {
-			SetValueString ( $this->GetIDForIdent ( "DuoFernCode" ), $duoFernCode );
+		$duoFernCodeVarId = $this->GetIDForIdent ( "DuoFernCode" );
+		if ($duoFernCode !== GetValueString ( $duoFernCodeVarId )) {
+			SetValueString ( $duoFernCodeVarId, $duoFernCode );
 		}
 	}
 	public function HelloWorldGateway() {
