@@ -1,5 +1,7 @@
 <?
+require_once (__DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "libs" . DIRECTORY_SEPARATOR . "DuoFernProtocol.php");
 class DuoFernConfigurator extends IPSModule {
+	use DuoFernFunction;
 	public function __construct($InstanceID) {
 		parent::__construct ( $InstanceID );
 	}
@@ -10,9 +12,6 @@ class DuoFernConfigurator extends IPSModule {
 	}
 	public function ApplyChanges() {
 		parent::ApplyChanges ();
-	}
-	public function HelloWorldConfigurator() {
-		echo "Hello World Configurator!";
 	}
 }
 ?>
