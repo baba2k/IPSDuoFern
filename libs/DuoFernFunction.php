@@ -35,7 +35,7 @@ trait DuoFernFunction {
 		// send to parent io
 		$result = $this->SendDataToParent ( $data );
 		
-		return $result;
+		return ($result === false ? false : true);
 	}
 }
 ?>

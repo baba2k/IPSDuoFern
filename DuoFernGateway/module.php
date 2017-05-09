@@ -1,14 +1,44 @@
 <?
 require_once (__DIR__ . DIRECTORY_SEPARATOR . "module_public.php");
 require_once (__DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "libs" . DIRECTORY_SEPARATOR . "DuoFernProtocol.php");
+
+/**
+ * IPSDuofern - Control Rademacher DuoFern devices with IP-Symcon
+ * Module: DuoFern Gateway
+ *
+ * @author Sebastian Leicht (baba@baba.tk)
+ *        
+ */
 class DuoFernGateway extends IPSModule {
+	/**
+	 * Module status codes
+	 *
+	 * @var integer
+	 */
 	const STATUS_ERROR_INVALID_DUOFERN_CODE = 201;
 	const STATUS_INSTANCE_ACTIVE = 102;
+	
+	/**
+	 * Traits
+	 * Includes a group of methods
+	 */
 	use DuoFernGatewayPublic;
 	use DuoFernFunction;
+	
+	/**
+	 * Manages the instantiation
+	 * Will be calld on every method call
+	 *
+	 * @param int $InstanceID        	
+	 */
 	public function __construct($InstanceID) {
 		parent::__construct ( $InstanceID );
 	}
+	
+	/**
+	 * Creates module properties
+	 * Will be called when creating the instance and on starting IP-Symcon
+	 */
 	public function Create() {
 		parent::Create ();
 		
@@ -22,10 +52,15 @@ class DuoFernGateway extends IPSModule {
 		// register status variables
 		$this->RegisterVariableString ( "DuoFernCode", "DuoFern Code" );
 	}
+	
+	/**
+	 * Applies the changes
+	 * Will be called when click on "Apply" at the configuration form or after creating the instance
+	 */
 	public function ApplyChanges() {
 		parent::ApplyChanges ();
 		
-		// modus
+		// property modus
 		switch ($this->ReadPropertyInteger ( "modus" )) {
 			case 0 : // force serial port as parent
 				$this->ForceParent ( "{6DC3D946-0D31-450F-A8C6-C42DB8D7D4F1}" );
@@ -35,7 +70,7 @@ class DuoFernGateway extends IPSModule {
 				break;
 		}
 		
-		// duo fern code
+		// property duoFernCode
 		$duoFernCode = $this->ReadPropertyString ( 'duoFernCode' );
 		if (! preg_match ( DUOFERN_REGEX_DUOFERN_CODE, $duoFernCode )) {
 			$this->SetStatus ( self::STATUS_ERROR_INVALID_DUOFERN_CODE );
@@ -51,11 +86,11 @@ class DuoFernGateway extends IPSModule {
 	}
 	
 	/**
-	 * Receive data from parent IO
+	 * Receive data from parent
+	 * Will be called when receiving data from parent
 	 *
 	 * @param string $JSONString
 	 *        	data json encoded
-	 * @return boolean always true
 	 */
 	public function ReceiveData($JSONString) {
 		// decode data
@@ -92,9 +127,15 @@ class DuoFernGateway extends IPSModule {
 		
 		// set last receive timestamp
 		$this->SetBuffer ( "LastReceiveTimestamp", time () );
-		
-		return true;
 	}
+	
+	/**
+	 * Sends data to parent
+	 * Will be called from methods ForwardData
+	 *
+	 * @param string $Data        	
+	 * @return result data
+	 */
 	protected function SendDataToParent($Data) {
 		// send to parent io
 		$result = parent::SendDataToParent ( json_encode ( Array (
@@ -105,8 +146,15 @@ class DuoFernGateway extends IPSModule {
 		// send msg as debug msg
 		$this->SendDebug ( "TRANSMIT", $Data, 1 );
 		
-		return ($result === false ? false : true);
+		return $result;
 	}
+	
+	/**
+	 * Forwards data to parent and handle data
+	 *
+	 * @param string $JSONString        	
+	 * @return result data
+	 */
 	public function ForwardData($JSONString) {
 		
 		// decode data
@@ -119,7 +167,7 @@ class DuoFernGateway extends IPSModule {
 	}
 	
 	/**
-	 * Configuration for parent
+	 * Configurates the parent io serial port
 	 * Set and Lock baudrate, stopbits, databits and parity for serial port
 	 *
 	 * @return configuration json string
