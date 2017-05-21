@@ -35,9 +35,6 @@ class DuoFernGateway extends IPSModule {
 	public function Create() {
 		parent::Create ();
 		
-		// force serial port as parent
-		// $this->ForceParent ( "{6DC3D946-0D31-450F-A8C6-C42DB8D7D4F1}" );
-		
 		// register properties
 		$this->RegisterPropertyInteger ( "modus", 0 );
 		$this->RegisterPropertyString ( "duoFernCode", $this->RandomGatewayDuoFernCode () );
@@ -45,7 +42,7 @@ class DuoFernGateway extends IPSModule {
 		// register status variables
 		$this->RegisterVariableString ( "DuoFernCode", "DuoFern Code" );
 		
-		// set buffers
+		// create buffers
 		$this->ReceiveBuffer = "";
 		$this->LastReceiveTimestampBuffer = "";
 		$this->WaitForResponseBuffer = new DuoFernWaitForResponseBuffer ();
@@ -66,7 +63,7 @@ class DuoFernGateway extends IPSModule {
 		// call parent
 		parent::ApplyChanges ();
 		
-		// kernel is not ready
+		// return when kernel is not ready
 		if (IPS_GetKernelRunlevel () != KR_READY) {
 			return;
 		}
@@ -154,7 +151,7 @@ class DuoFernGateway extends IPSModule {
 	}
 	
 	/**
-	 * Forwards data to parent and handle data
+	 * Forwards data to parent and handles data
 	 *
 	 * @param string $JSONString        	
 	 * @return result data
