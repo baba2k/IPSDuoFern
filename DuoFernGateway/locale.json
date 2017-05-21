@@ -3,11 +3,12 @@
 		"de": {
 			"Modus": "Modus",
 			"Attention! If the DuoFern code is lost, all devices must be re-learned.": "Achtung! Bei Verlust des DuoFern Code's, müssen alle Geräte neu angemeldet werden.",
-			"Instance is created": "Instanz wird erstellt",
+			"Instance will be created": "Instanz wird erstellt",
 			"Instance is active": "Instanz ist aktiv",
-			"Instance is deleted": "Instanz wird gelöscht",
+			"Instance will be deleted": "Instanz wird gelöscht",
 			"Instance is inactive": "Instanz ist inaktiv",
-			"Invalid DuoFern code (Format: 6FXXXX with X = 0-9, A-F)": "DuoFern Code ist ungültig (Format: 6FXXXX mit X = 0-9, A-F)"
+			"Invalid DuoFern code (Format: 6FXXXX with X = 0-9, A-F)": "DuoFern Code ist ungültig (Format: 6FXXXX mit X = 0-9, A-F)",
+			"Initialization failed": "Initialisierung fehlgeschlagen"
 		}
 	}
 }

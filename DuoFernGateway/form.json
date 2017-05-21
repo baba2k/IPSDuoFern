@@ -51,6 +51,11 @@
 			"code": 201,
 			"icon": "error",
 			"caption": "Invalid DuoFern code (Format: 6FXXXX with X = 0-9, A-F)"
+		},
+		{
+			"code": 202,
+			"icon": "error",
+			"caption": "Initialization failed"
 		}
 	]
 }
