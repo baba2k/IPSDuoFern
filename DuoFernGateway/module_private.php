@@ -236,7 +236,7 @@ trait PrivateFunction {
 	 */
 	private function UpdateParentData() {
 		$oldParentId = $this->ParentInstanceID;
-		$parentId = @IPS_GetInstance ( $this->InstanceID ) ['ConnectionID'];
+		$parentId = IPS_GetInstance ( $this->InstanceID ) ['ConnectionID'];
 		
 		// no parent change
 		if ($parentId == $oldParentId) {
@@ -269,7 +269,15 @@ trait PrivateFunction {
 	 */
 	private function UpdateChildrenData() {
 		$oldChildrenIds = $this->ChildrenInstanceIDs;
-		$childrenIds = @IPS_GetChildrenIDs ( $this->InstanceID );
+		$childrenIds = IPS_GetInstanceListByModuleID ( "{DEVICE_GUID}" );
+		$parentId = IPS_GetInstance ( $this->InstanceID ) ['ConnectionID'];
+		
+		// ignore instances if they are not children
+		foreach ( $childrenIds as $childId ) {
+			if (PS_GetInstance ( $childId ) ['ConnectionID'] != $parentId) {
+				unset ( $childrenIds [$childId] );
+			}
+		}
 		
 		// no children changes
 		if ($childrenIds == $oldChildrenIds) {
@@ -278,11 +286,6 @@ trait PrivateFunction {
 		
 		// unregister messagesat old children
 		foreach ( array_diff ( $oldChildrenIds, $childrenIds ) as $oldChildId ) {
-			// child has no duo fern code property
-			if (@IPS_GetProperty ( $oldChildId, "duoFernCode" ) === false) {
-				continue;
-			}
-			
 			// unregister messages
 			if ($oldChildId > 0) {
 				$this->UnregisterMessage ( $oldChildId, IM_CHANGESETTINGS );
@@ -291,11 +294,6 @@ trait PrivateFunction {
 		
 		// register messages at new children
 		foreach ( array_diff ( $childrenIds, $oldChildrenIds ) as $childId ) {
-			// child has no duo fern code property
-			if (@IPS_GetProperty ( $childId, "duoFernCode" ) === false) {
-				continue;
-			}
-			
 			// register messages
 			if ($childId > 0) {
 				$this->RegisterMessage ( $childId, IM_CHANGESETTINGS );
@@ -328,16 +326,23 @@ trait PrivateFunction {
 	 */
 	private function GetDeviceDuoFernCodes() {
 		$duoFernCodes = array ();
-		$childrenIds = @IPS_GetChildrenIDs ( $this->InstanceID );
+		$childrenIds = IPS_GetInstanceListByModuleID ( "{DEVICE_GUID}" );
+		$parentId = IPS_GetInstance ( $this->InstanceID ) ['ConnectionID'];
+		
 		$i = 0;
 		foreach ( $childrenIds as $childId ) {
+			// ignore instance if it is not a child
+			if (PS_GetInstance ( $childId ) ['ConnectionID'] != $parentId) {
+				continue;
+			}
+			
 			// 100 devices maximum
 			if ($i > 100) {
 				break;
 			}
 			
 			// get child duo fern code
-			$duoFernCode = @IPS_GetProperty ( $childId, "duoFernCode" );
+			$duoFernCode = IPS_GetProperty ( $childId, "duoFernCode" );
 			
 			// add duo fern code to array
 			if ($duoFernCode !== false && preg_match ( DUOFERN_REGEX_DUOFERN_CODE, $duoFernCode )) {

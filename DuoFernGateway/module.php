@@ -222,6 +222,10 @@ class DuoFernGateway extends IPSModule {
 					$this->ForceRefresh ();
 				}
 				break;
+			case IM_CHANGESETTINGS :
+				$this->SendDebug ( "MSG IM_CHANGESETTINGS", "Message: " . $Message . ", Data: " . $Data . ", SenderID: ", $SenderID . ", Timestamp: " . $TimeStamp, 0 );
+				// $this->ForceRefresh ();
+				break;
 		}
 	}
 	
