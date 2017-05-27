@@ -1,17 +1,17 @@
 {
-	"id": "{610F4624-BABA-4B0B-BFA3-B71677D35426}",
-	"author": "Sebastian Leicht",
-	"name": "DuoFern Library",
-	"url": "https://github.com/baba2k/IPSDuoFern",
-	"version": "0.1",
-	"build": 0,
-	"date": 1493589500,
-	"title": "Rademacher DuoFern",
-	"description": "Ermoeglicht die Anbindung des Rademacher DuoFern USB-Stick vom Typ 9495-UW.",
-	"tags": [
-		"Rademacher",
-		"DuoFern",
-		"9495-UW"
-	],
-	"req_ips_version": "4.2"
+  "id": "{610F4624-BABA-4B0B-BFA3-B71677D35426}",
+  "author": "Sebastian Leicht",
+  "name": "DuoFern Library",
+  "url": "https://github.com/baba2k/IPSDuoFern",
+  "version": "0.1",
+  "build": 0,
+  "date": 1493589500,
+  "title": "Rademacher DuoFern",
+  "description": "Ermöglicht die Anbindung des Rademacher DuoFern USB-Stick vom Typ 9495-UW.",
+  "tags": [
+    "Rademacher",
+    "DuoFern",
+    "9495-UW"
+  ],
+  "req_ips_version": "4.2"
 }

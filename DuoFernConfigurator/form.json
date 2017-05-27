@@ -1,0 +1,12 @@
+{
+  "actions": [
+    {
+      "type": "List",
+      "name": "deviceList",
+      "columns": [
+      ],
+      "values": [
+      ]
+    }
+  ]
+}

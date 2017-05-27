@@ -5,13 +5,21 @@ require_once(__DIR__ . DIRECTORY_SEPARATOR . "module_public.php");
 
 /**
  * IPSDuofern - Control Rademacher DuoFern devices with IP-Symcon
- * Module: DuoFern Configurator
+ * Module: DuoFern Device
  *
  * @author Sebastian Leicht (baba@baba.tk)
  *
  */
-class DuoFernConfigurator extends IPSModule
+class DuoFernDevice extends IPSModule
 {
+    /**
+     * Module status error codes
+     *
+     * @var int
+     */
+    const IS_INVALID_DUOFERN_CODE = IS_EBASE + 1;
+    const IS_DEVICE_NOT_AVAILABLE = IS_EBASE + 2;
+
     /**
      * Traits
      * Includes a group of methods
@@ -26,6 +34,9 @@ class DuoFernConfigurator extends IPSModule
     public function Create()
     {
         parent::Create();
+
+        // register properties
+        $this->RegisterPropertyString("duoFernCode", "XXXXXX");
     }
 
     /**
@@ -37,7 +48,19 @@ class DuoFernConfigurator extends IPSModule
         parent::ApplyChanges();
 
         // require gateway as parent
-        $this->ForceParent("{7AB07511-BABA-418B-81C5-88A7C709D318}");
+        $this->RequireParent("{7AB07511-BABA-418B-81C5-88A7C709D318}");
+
+        // property duoFernCode
+        $duoFernCode = $this->ReadPropertyString("duoFernCode");
+        if (!preg_match(DUOFERN_REGEX_DUOFERN_CODE, $duoFernCode)) {
+            $this->SetStatus(self::IS_INVALID_DUOFERN_CODE);
+
+        } else {
+            $this->SetStatus(IS_ACTIVE);
+        }
+
+        // set receive data filter
+        $this->SetReceiveDataFilter("(.*" . $this->ConvertMsgToSend($duoFernCode) . ".*)");
     }
 
     /**

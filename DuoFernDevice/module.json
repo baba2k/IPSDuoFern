@@ -1,0 +1,17 @@
+{
+	"id": "{BE62B172-BABA-4EB1-8C4C-507526645ED5}",
+	"name": "DuoFern Device",
+	"type": 3,
+	"vendor": "DuoFern",
+	"aliases": [
+		"DuoFern Device"
+	],
+	"parentRequirements": [
+		"{D608631B-BABA-4D08-ADB0-5364DD6A2526}"
+	],
+	"childRequirements": [],
+	"implemented": [
+		"{244143D3-BABA-44D4-8740-B997B8F09E50}"
+	],
+	"prefix": "DUOFERN"
+}

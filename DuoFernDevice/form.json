@@ -1,29 +1,9 @@
 {
   "elements": [
     {
-      "type": "Select",
-      "name": "modus",
-      "caption": "Modus",
-      "options": [
-        {
-          "label": "DuoFern 9495-UW (USB)",
-          "value": 0
-        },
-        {
-          "label": "DuoFern 9495-UW (TCP/IP)",
-          "value": 1
-        }
-      ]
-    },
-    {
       "type": "ValidationTextBox",
       "name": "duoFernCode",
       "caption": "DuoFern Code"
-    },
-    {
-      "type": "Label",
-      "name": "hintDuoFernCode'",
-      "label": "Attention! If the DuoFern code is lost, all devices must be re-learned."
     }
   ],
   "status": [
@@ -50,12 +30,12 @@
     {
       "code": 201,
       "icon": "error",
-      "caption": "Invalid DuoFern code (Format: 6FXXXX with X = 0-9, A-F)"
+      "caption": "Invalid DuoFern code (Format: XXXXXX with X = 0-9, A-F)"
     },
     {
       "code": 202,
       "icon": "error",
-      "caption": "Initialization failed"
+      "caption": "Device is not available"
     }
   ]
 }

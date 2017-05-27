@@ -1,0 +1,12 @@
+{
+  "translations": {
+    "de": {
+      "Instance will be created": "Instanz wird erstellt",
+      "Instance is active": "Instanz ist aktiv",
+      "Instance will be deleted": "Instanz wird gelöscht",
+      "Instance is inactive": "Instanz ist inaktiv",
+      "Invalid DuoFern code (Format: XXXXXX with X = 0-9, A-F)": "DuoFern Code ist ungültig (Format: XXXXXX mit X = 0-9, A-F)",
+      "Device is not available": "Gerät ist nicht erreichbar"
+    }
+  }
+}
