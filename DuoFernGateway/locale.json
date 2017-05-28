@@ -8,7 +8,8 @@
       "Instance will be deleted": "Instanz wird gelöscht",
       "Instance is inactive": "Instanz ist inaktiv",
       "Invalid DuoFern code (Format: 6FXXXX with X = 0-9, A-F)": "DuoFern Code ist ungültig (Format: 6FXXXX mit X = 0-9, A-F)",
-      "Initialization failed": "Initialisierung fehlgeschlagen"
+      "Initialization failed": "Initialisierung fehlgeschlagen",
+      "Message could not be sent":"Nachricht konnte nicht gesendet werden"
     }
   }
 }

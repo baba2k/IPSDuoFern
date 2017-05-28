@@ -66,12 +66,44 @@ trait LibraryFunction
         $result = $this->SendDataToParent($data);
 
         if ($result !== false) {
-            $this->SendDebug("RECEIVED RESPONSE", $result, 1);
+            $this->SendDebug("RECEIVED RESPONSE", $this->ConvertMsgToSend($result), 1);
         } else {
             $this->SendDebug("TIMEOUT WAITFORRESPONSE", $this->ConvertMsgToSend($this->ExpectedResponse($msg)), 1);
         }
 
         return $result;
+    }
+
+    /**
+     * Generates the expected response of a msg
+     *
+     * @param string $msg
+     *            message in hex string in format /^[0-9A-F]{44}$/
+     * @return boolean|string expected response msg or false on failure
+     */
+    private function ExpectedResponse($msg)
+    {
+        // check valid msg
+        if (!preg_match(DUOFERN_REGEX_MSG, $msg)) {
+            return false;
+        }
+
+        // get gateway duo fern code
+        $duoFernCode = $this->ReadPropertyString('duoFernCode');
+
+        // generate expected response for msg
+        switch ($msg) {
+            case $this->MsgInitSerial($duoFernCode) :
+                $expectedResponse = "81" . substr($msg, 2, 6) . "0100" . substr($msg, 12);
+                break;
+            case DUOFERN_MSG_GET_ALL_DEVICES_STATUS :
+                $expectedResponse = "81000000" . substr($msg, 8);
+                break;
+            default :
+                $expectedResponse = "81" . substr($msg, 2);
+        }
+
+        return $expectedResponse;
     }
 }
 
@@ -162,4 +194,40 @@ define("DUOFERN_REGEX_ACK", "/^81[0-9A-F]{42}$/");
 
 // valid duo fern pairtable number
 define("DUOFERN_REGEX_PAIRTABLE_NUMBER", "/^[0-9A-F]{2}$/");
+
+/**
+ * DuoFernDeviceTypes
+ */
+$duoFernDeviceTypes = [
+    "40" => "RolloTron Standard",
+    "41" => "RolloTron Comfort Slave",
+    "42" => "Rohrmotor-Aktor",
+    "43" => "Universalaktor",
+    "46" => "Steckdosenaktor",
+    "47" => "Rohrmotor Steuerung",
+    "48" => "Dimmaktor",
+    "49" => "Rohrmotor",
+    "4B" => "Connect-Aktor",
+    "4C" => "Troll Basis DuoFern",
+    "4E" => "SX5",
+    "61" => "RolloTron Comfort Master",
+    "62" => "Super Fake Device",
+    "65" => "Bewegungsmelder",
+    "69" => "Umweltsensor",
+    "70" => "Troll Comfort DuoFern",
+    "71" => "Troll Comfort DuoFern (Lichtmodus)",
+    "73" => "Raumthermostat",
+    "74" => "Wandtaster 6fach 230V",
+    "A0" => "Handsender (6 Gruppen-48 Geräte)",
+    "A1" => "Handsender (1 Gruppe-48 Geräte)",
+    "A2" => "Handsender (6 Gruppen-1 Gerät)",
+    "A3" => "Handsender (1 Gruppe-1 Gerät)",
+    "A4" => "Wandtaster",
+    "A5" => "Sonnensensor",
+    "A7" => "Funksender UP",
+    "A8" => "HomeTimer",
+    "AA" => "Markisenwaechter",
+    "AB" => "Rauchmelder",
+    "AD" => "Wandtaster 6fach BAT",
+];
 ?>

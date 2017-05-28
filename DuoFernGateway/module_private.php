@@ -136,38 +136,6 @@ trait PrivateFunction
     }
 
     /**
-     * Generates the expected response of a msg
-     *
-     * @param string $msg
-     *            message in hex string in format /^[0-9A-F]{44}$/
-     * @return boolean|string expected response msg or false on failure
-     */
-    private function ExpectedResponse($msg)
-    {
-        // check valid msg
-        if (!preg_match(DUOFERN_REGEX_MSG, $msg)) {
-            return false;
-        }
-
-        // get gateway duo fern code
-        $duoFernCode = $this->ReadPropertyString('duoFernCode');
-
-        // generate expected response for msg
-        switch ($msg) {
-            case $this->MsgInitSerial($duoFernCode) :
-                $expectedResponse = "81" . substr($msg, 2, 6) . "0100" . substr($msg, 12);
-                break;
-            case DUOFERN_MSG_GET_ALL_DEVICES_STATUS :
-                $expectedResponse = "81000000" . substr($msg, 8);
-                break;
-            default :
-                $expectedResponse = "81" . substr($msg, 2);
-        }
-
-        return $expectedResponse;
-    }
-
-    /**
      * Waits for a given response
      *
      * @param string $exptedResponse

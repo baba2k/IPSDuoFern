@@ -3,10 +3,39 @@
     {
       "type": "List",
       "name": "deviceList",
+      "sort": {
+        "column": "DuoFern Code",
+        "direction": "ascending"
+      },
       "columns": [
+        {
+          "label": "DuoFern Code",
+          "name": "duoFernCode",
+          "width": "85px"
+        },
+        {
+          "label": "Type",
+          "name": "type",
+          "width": "150px"
+        },
+        {
+          "label": "Name",
+          "name": "name",
+          "width": "auto"
+        },
+        {
+          "label": "InstanceID",
+          "name": "instanceId",
+          "width": "75px"
+        }
       ],
       "values": [
       ]
+    },
+    {
+      "type": "Button",
+      "label": "Create Instance",
+      "onClick": "trigger_error('Function not implemented yet' . PHP_EOL, E_USER_NOTICE);"
     }
   ]
 }

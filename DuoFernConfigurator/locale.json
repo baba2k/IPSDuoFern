@@ -1,6 +1,10 @@
 {
   "translations": {
     "de": {
+      "Type":"Typ",
+      "InstanceID":"InstanzID",
+      "Create Instance":"Erstelle Instanz",
+      "Message could not be sent":"Nachricht konnte nicht gesendet werden"
     }
   }
 }

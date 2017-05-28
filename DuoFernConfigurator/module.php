@@ -58,6 +58,107 @@ class DuoFernConfigurator extends IPSModule
         // send msg as debug msg
         $this->SendDebug("RECEIVED", $msg, 1);
     }
+
+    /**
+     * Sends data to parent
+     * Will be called from methods ForwardData
+     *
+     * @param string $Data
+     * @return string|bool result data or false if not sent
+     */
+    protected function SendDataToParent($Data)
+    {
+        // discard if no active parent
+        if (!$this->IsParentInstanceActive()) {
+            $this->SendDebug("DISCARD TRANSMIT", $Data, 1);
+            trigger_error($this->Translate("Message could not be sent") . PHP_EOL, E_USER_ERROR);
+            return false;
+        }
+
+        // send to parent io
+        $result = parent::SendDataToParent(json_encode(Array(
+            "DataID" => "{D608631B-BABA-4D08-ADB0-5364DD6A2526}",
+            "Buffer" => utf8_encode($Data)
+        )));
+
+        // trigger error when msg not sent
+        if ($result === false) {
+            $this->SendDebug("FAILED TRANSMIT", $Data, 1);
+            trigger_error($this->Translate("Message could not be sent") . PHP_EOL, E_USER_ERROR);
+            return false;
+        }
+
+        // send msg as debug msg
+        if (strcmp($this->ConvertMsgToDisplay($Data), DUOFERN_MSG_ACK) === 0) {
+            $this->SendDebug("TRANSMIT ACK", $Data, 1);
+        } else {
+            $this->SendDebug("TRANSMIT", $Data, 1);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Configurates the parent io serial port
+     * Set and Lock baudrate, stopbits, databits and parity for serial port
+     *
+     * @return string configuration json string
+     */
+    public function GetConfigurationForm()
+    {
+        global $duoFernDeviceTypes;
+        $deviceInstanceIds = IPS_GetInstanceListByModuleID("{BE62B172-BABA-4EB1-8C4C-507526645ED5}");
+        $parentId = IPS_GetInstance($this->InstanceID)['ConnectionID'];
+        $deviceList = array();
+
+        foreach ($deviceInstanceIds as $instanceId) {
+            // discard if not connected
+            if (IPS_GetInstance($instanceId)['ConnectionID'] != $parentId) {
+                continue;
+            }
+
+            $duoFernCode = IPS_GetProperty($instanceId, "duoFernCode");
+            $deviceType = substr($duoFernCode, 0, 2);
+
+            $device = [
+                "duoFernCode" => chunk_split($duoFernCode, 2, " "),
+                "type" => array_key_exists($deviceType, $duoFernDeviceTypes) ? $duoFernDeviceTypes[$deviceType] : "",
+                "name" => IPS_GetLocation($instanceId),
+                "instanceId" => $instanceId,
+                "rowColor" => "#C0FFC0"
+            ];
+
+            $deviceList[] = $device;
+        }
+
+        // get form json as array
+        $data = json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . "form.json"), true);
+
+        // add items to list
+        $data['actions'][0]['values'] = array_merge($data['actions'][0]['values'], $deviceList);
+
+        return json_encode($data);
+    }
+
+    /**
+     * WORKAROUND UNTIL 4.3
+     * Translates a given string with locale.json
+     * @param $string
+     * @return mixed
+     */
+    private function Translate($string)
+    {
+        $translations = json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . "locale.json"), true);
+        $translations = $translations["translations"]["de"];
+
+        // found translation
+        if (array_key_exists($string, $translations)) {
+            return $translations[$string];
+        }
+
+        // do not translate
+        return $string;
+    }
 }
 
 ?>

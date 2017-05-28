@@ -85,7 +85,7 @@ class DuoFernGateway extends IPSModule
         $duoFernCode = $this->ReadPropertyString("duoFernCode");
         if (!preg_match(DUOFERN_REGEX_GATEWAY_DUOFERN_CODE, $duoFernCode)) {
             $this->SetStatus(self::IS_INVALID_DUOFERN_CODE);
-        } else {
+        } else if ($this->GetStatus() == self::IS_INVALID_DUOFERN_CODE) {
             $this->SetStatus(IS_ACTIVE);
         }
 
@@ -126,28 +126,29 @@ class DuoFernGateway extends IPSModule
         if (strlen($receiveBuffer) >= 22) {
             // get msg from buffer
             $msg = substr($receiveBuffer, 0, 22);
+            $displayMsg = $this->ConvertMsgToDisplay($msg);
 
             // remove msg from receive buffer
             $receiveBuffer = substr($receiveBuffer, 22);
 
             // ack / response msg
-            if (preg_match(DUOFERN_REGEX_ACK, $this->ConvertMsgToDisplay($msg))) {
+            if (preg_match(DUOFERN_REGEX_ACK, $displayMsg)) {
                 $waitForResponseBuffer = $this->WaitForResponseBuffer;
-                $waitForResponseBuffer->Add($this->ConvertMsgToDisplay($msg));
+                $waitForResponseBuffer->Add($displayMsg);
                 $this->WaitForResponseBuffer = $waitForResponseBuffer;
                 $this->SendDebug("RECEIVED RESPONSE", $msg, 1);
             } else { // normal msg
                 $this->SendDebug("RECEIVED", $msg, 1);
 
                 // forward to devices
-                $this->SendDataToChildren(json_encode(Array("DataID" => "{244143D3-BABA-44D4-8740-B997B8F09E50}", "Buffer" => utf8_encode($msg))));
+                $this->SendDataToChildren(json_encode(Array("DataID" => "{244143D3-BABA-44D4-8740-B997B8F09E50}", "Buffer" => utf8_encode($msg), "DuoFernCode" => substr($displayMsg, 30, 6))));
 
                 // forward to configurator
                 $this->SendDataToChildren(json_encode(Array("DataID" => "{15FD9630-BABA-4BCB-90E4-7DE815ECB79D}", "Buffer" => utf8_encode($msg))));
             }
 
             // send ack
-            if (strcmp($this->ConvertMsgToDisplay($msg), DUOFERN_MSG_ACK) !== 0) {
+            if (strcmp($displayMsg, DUOFERN_MSG_ACK) !== 0) {
                 $this->SendMsg(DUOFERN_MSG_ACK);
             }
         }
@@ -193,6 +194,7 @@ class DuoFernGateway extends IPSModule
         // discard if instance inactive or no active parent
         if (!$this->IsInstanceActive() || !$this->IsParentInstanceActive()) {
             $this->SendDebug("DISCARD TRANSMIT", $Data, 1);
+            trigger_error($this->Translate("Message could not be sent") . PHP_EOL, E_USER_ERROR);
             return false;
         }
 
@@ -201,6 +203,13 @@ class DuoFernGateway extends IPSModule
             "DataID" => "{79827379-F36E-4ADA-8A95-5F8D1DC92FA9}",
             "Buffer" => utf8_encode($Data)
         )));
+
+        // trigger error when msg not sent
+        if ($result === false) {
+            $this->SendDebug("FAILED TRANSMIT", $Data, 1);
+            trigger_error($this->Translate("Message could not be sent") . PHP_EOL, E_USER_ERROR);
+            return false;
+        }
 
         // send msg as debug msg
         if (strcmp($this->ConvertMsgToDisplay($Data), DUOFERN_MSG_ACK) === 0) {
@@ -264,6 +273,26 @@ class DuoFernGateway extends IPSModule
     public function GetConfigurationForParent()
     {
         return "{\"BaudRate\": \"115200\", \"StopBits\": \"1\", \"DataBits\": \"8\", \"Parity\": \"None\"}";
+    }
+
+    /**
+     * WORKAROUND UNTIL 4.3
+     * Translates a given string with locale.json
+     * @param $string
+     * @return mixed
+     */
+    private function Translate($string)
+    {
+        $translations = json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . "locale.json"), true);
+        $translations = $translations["translations"]["de"];
+
+        // found translation
+        if (array_key_exists($string, $translations)) {
+            return $translations[$string];
+        }
+
+        // do not translate
+        return $string;
     }
 }
 
