@@ -2,6 +2,8 @@
   "translations": {
     "de": {
       "Type":"Typ",
+      "Unknown":"Unbekannt",
+      "Last Message":"Letzte Nachricht",
       "InstanceID":"InstanzID",
       "Find devices":"Suche Geräte",
       "Message could not be sent":"Nachricht konnte nicht gesendet werden"

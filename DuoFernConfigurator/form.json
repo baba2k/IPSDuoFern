@@ -16,12 +16,17 @@
         {
           "label": "Type",
           "name": "type",
-          "width": "150px"
+          "width": "120px"
         },
         {
           "label": "Name",
           "name": "name",
           "width": "auto"
+        },
+        {
+          "label": "Last Message",
+          "name": "lastMsg",
+          "width": "90px"
         },
         {
           "label": "InstanceID",

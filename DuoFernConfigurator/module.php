@@ -26,6 +26,9 @@ class DuoFernConfigurator extends IPSModule
     public function Create()
     {
         parent::Create();
+
+        // create buffers
+        $this->LastMessageBuffer = array();
     }
 
     /**
@@ -57,6 +60,12 @@ class DuoFernConfigurator extends IPSModule
 
         // send msg as debug msg
         $this->SendDebug("RECEIVED", $msg, 1);
+
+        // save last message timestamp
+        $lastMessageBuffer = (array)$this->LastMessageBuffer; // get buffer
+        $duoFernCode = (string)substr($this->ConvertMsgToDisplay($msg), 30, 6);
+        $lastMessageBuffer[$duoFernCode] = time();
+        $this->LastMessageBuffer = $lastMessageBuffer;
     }
 
     /**
@@ -109,6 +118,7 @@ class DuoFernConfigurator extends IPSModule
         $deviceInstanceIds = IPS_GetInstanceListByModuleID("{BE62B172-BABA-4EB1-8C4C-507526645ED5}");
         $parentId = IPS_GetInstance($this->InstanceID)['ConnectionID'];
         $deviceList = array();
+        $lastMessageBuffer = (array)$this->LastMessageBuffer; // get las message buffer
 
         foreach ($deviceInstanceIds as $instanceId) {
             // discard if not connected
@@ -118,11 +128,15 @@ class DuoFernConfigurator extends IPSModule
 
             $duoFernCode = IPS_GetProperty($instanceId, "duoFernCode");
             $deviceType = substr($duoFernCode, 0, 2);
+            $timeStamp = isset ($lastMessageBuffer[$duoFernCode]) ? $lastMessageBuffer[$duoFernCode] : null;
+            $timeString = date('Ymd') == date('Ymd', $timeStamp) && $timeStamp != null ?
+                date('H:i:s', $timeStamp) : date('d.m.Y H:i:s', $timeStamp);
 
             $device = [
                 "duoFernCode" => chunk_split($duoFernCode, 2, " "),
-                "type" => array_key_exists($deviceType, $duoFernDeviceTypes) ? $duoFernDeviceTypes[$deviceType] : "",
+                "type" => array_key_exists($deviceType, $duoFernDeviceTypes) ? $duoFernDeviceTypes[$deviceType] : $this->Translate("Unknown"),
                 "name" => IPS_GetLocation($instanceId),
+                "lastMsg" => $timeStamp != null ? $timeString : "N/A",
                 "instanceId" => $instanceId,
                 "rowColor" => "#C0FFC0"
             ];
