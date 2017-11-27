@@ -99,8 +99,7 @@ class DuoFernConfigurator extends IPSModule
     }
 
     /**
-     * Configurates the parent io serial port
-     * Set and Lock baudrate, stopbits, databits and parity for serial port
+     * Sets dynamic configuration form for device list
      *
      * @return string configuration json string
      */
@@ -138,26 +137,6 @@ class DuoFernConfigurator extends IPSModule
         $data['actions'][0]['values'] = array_merge($data['actions'][0]['values'], $deviceList);
 
         return json_encode($data);
-    }
-
-    /**
-     * WORKAROUND UNTIL 4.3
-     * Translates a given string with locale.json
-     * @param $string
-     * @return mixed
-     */
-    private function Translate($string)
-    {
-        $translations = json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . "locale.json"), true);
-        $translations = $translations["translations"]["de"];
-
-        // found translation
-        if (array_key_exists($string, $translations)) {
-            return $translations[$string];
-        }
-
-        // do not translate
-        return $string;
     }
 }
 

@@ -274,26 +274,6 @@ class DuoFernGateway extends IPSModule
     {
         return "{\"BaudRate\": \"115200\", \"StopBits\": \"1\", \"DataBits\": \"8\", \"Parity\": \"None\"}";
     }
-
-    /**
-     * WORKAROUND UNTIL 4.3
-     * Translates a given string with locale.json
-     * @param $string
-     * @return mixed
-     */
-    private function Translate($string)
-    {
-        $translations = json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . "locale.json"), true);
-        $translations = $translations["translations"]["de"];
-
-        // found translation
-        if (array_key_exists($string, $translations)) {
-            return $translations[$string];
-        }
-
-        // do not translate
-        return $string;
-    }
 }
 
 ?>

@@ -48,7 +48,7 @@ class DuoFernDevice extends IPSModule
         parent::ApplyChanges();
 
         // require gateway as parent
-        $this->RequireParent("{7AB07511-BABA-418B-81C5-88A7C709D318}");
+        $this->ConnectParent("{7AB07511-BABA-418B-81C5-88A7C709D318}");
 
         // property duoFernCode
         $duoFernCode = $this->ReadPropertyString("duoFernCode");
@@ -136,26 +136,6 @@ class DuoFernDevice extends IPSModule
         $this->SetStatus(IS_ACTIVE);
 
         return $result;
-    }
-
-    /**
-     * WORKAROUND UNTIL 4.3
-     * Translates a given string with locale.json
-     * @param $string
-     * @return mixed
-     */
-    private function Translate($string)
-    {
-        $translations = json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . "locale.json"), true);
-        $translations = $translations["translations"]["de"];
-
-        // found translation
-        if (array_key_exists($string, $translations)) {
-            return $translations[$string];
-        }
-
-        // do not translate
-        return $string;
     }
 }
 
