@@ -34,8 +34,8 @@
     },
     {
       "type": "Button",
-      "label": "Create Instance",
-      "onClick": "trigger_error('Function not implemented yet' . PHP_EOL, E_USER_NOTICE);"
+      "label": "Find devices",
+      "onClick": "DUOFERN_SendRawMsgFromConfigurator($id, '0DFF0F400000000000000000000000000000FFFFFF01');"
     }
   ]
 }
