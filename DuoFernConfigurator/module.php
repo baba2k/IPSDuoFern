@@ -28,7 +28,7 @@ class DuoFernConfigurator extends IPSModule
         parent::Create();
 
         // create buffers
-        $this->LastMessageBuffer = array();
+        $this->SeenDevicesBuffer = array();
     }
 
     /**
@@ -61,11 +61,11 @@ class DuoFernConfigurator extends IPSModule
         // send msg as debug msg
         $this->SendDebug("RECEIVED", $msg, 1);
 
-        // save last message timestamp
-        $lastMessageBuffer = (array)$this->LastMessageBuffer; // get buffer
+        // save seen devices with last message timestamp
+        $seenDevicesBuffer = (array)$this->SeenDevicesBuffer; // get buffer
         $duoFernCode = (string)substr($this->ConvertMsgToDisplay($msg), 30, 6);
-        $lastMessageBuffer[$duoFernCode] = time();
-        $this->LastMessageBuffer = $lastMessageBuffer;
+        $seenDevicesBuffer[$duoFernCode] = time();
+        $this->SeenDevicesBuffer = $seenDevicesBuffer;
     }
 
     /**
@@ -118,8 +118,9 @@ class DuoFernConfigurator extends IPSModule
         $deviceInstanceIds = IPS_GetInstanceListByModuleID("{BE62B172-BABA-4EB1-8C4C-507526645ED5}");
         $parentId = IPS_GetInstance($this->InstanceID)['ConnectionID'];
         $deviceList = array();
-        $lastMessageBuffer = (array)$this->LastMessageBuffer; // get las message buffer
+        $seenDevicesBuffer = (array)$this->SeenDevicesBuffer; // get seen devices buffer
 
+        // add device instances
         foreach ($deviceInstanceIds as $instanceId) {
             // discard if not connected
             if (IPS_GetInstance($instanceId)['ConnectionID'] != $parentId) {
@@ -128,7 +129,7 @@ class DuoFernConfigurator extends IPSModule
 
             $duoFernCode = IPS_GetProperty($instanceId, "duoFernCode");
             $deviceType = substr($duoFernCode, 0, 2);
-            $timeStamp = isset ($lastMessageBuffer[$duoFernCode]) ? $lastMessageBuffer[$duoFernCode] : null;
+            $timeStamp = isset ($seenDevicesBuffer[$duoFernCode]) ? $seenDevicesBuffer[$duoFernCode] : null;
             $timeString = date('Ymd') == date('Ymd', $timeStamp) && $timeStamp != null ?
                 date('H:i:s', $timeStamp) : date('d.m.Y H:i:s', $timeStamp);
 
@@ -141,14 +142,40 @@ class DuoFernConfigurator extends IPSModule
                 "rowColor" => "#C0FFC0"
             ];
 
-            $deviceList[] = $device;
+            $deviceList[$duoFernCode] = $device;
         }
+
+        // add seen devices
+        foreach ($seenDevicesBuffer as $duoFernCode => $lastMessageTimestamp) {
+            // skip devices with instance
+            if (array_key_exists($duoFernCode, $deviceList)) {
+                continue;
+            }
+
+            $deviceType = substr($duoFernCode, 0, 2);
+            $timeStamp = isset ($seenDevicesBuffer[$duoFernCode]) ? $seenDevicesBuffer[$duoFernCode] : null;
+            $timeString = date('Ymd') == date('Ymd', $timeStamp) && $timeStamp != null ?
+                date('H:i:s', $timeStamp) : date('d.m.Y H:i:s', $timeStamp);
+
+            $device = [
+                "duoFernCode" => chunk_split($duoFernCode, 2, " "),
+                "type" => array_key_exists($deviceType, $duoFernDeviceTypes) ? $duoFernDeviceTypes[$deviceType] : $this->Translate("Unknown"),
+                "name" => "N/A",
+                "lastMsg" => $timeStamp != null ? $timeString : "N/A",
+                "instanceId" => "N/A"
+            ];
+
+            $deviceList[$duoFernCode] = $device;
+        }
+
+        // sort devices bei duo fern code
+        ksort($deviceList);
 
         // get form json as array
         $data = json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . "form.json"), true);
 
         // add items to list
-        $data['actions'][0]['values'] = array_merge($data['actions'][0]['values'], $deviceList);
+        $data['actions'][0]['values'] = array_merge($data['actions'][0]['values'], array_values($deviceList));
 
         return json_encode($data);
     }
