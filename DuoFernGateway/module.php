@@ -59,7 +59,7 @@ class DuoFernGateway extends IPSModule
     public function ApplyChanges()
     {
         // register messages
-        $this->RegisterMessage(0, IPS_KERNELMESSAGE);
+        $this->RegisterMessage(0, IPS_KERNELSTARTED);
         $this->RegisterMessage($this->InstanceID, FM_CONNECT);
         $this->RegisterMessage($this->InstanceID, FM_DISCONNECT);
 
@@ -232,10 +232,10 @@ class DuoFernGateway extends IPSModule
      */
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
     {
+        IPS_LogMessage("MessageSink", "Message from SenderID " . $SenderID . " with Message " . $Message . "\r\n Data: " . print_r($Data, true));
         switch ($Message) {
-            case IPS_KERNELMESSAGE :
-                if ($Data [0] == KR_READY)
-                    $this->ApplyChanges();
+            case IPS_KERNELSTARTED :
+                $this->ApplyChanges();
                 break;
             case FM_CONNECT :
             case FM_DISCONNECT :

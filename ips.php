@@ -167,6 +167,10 @@ if (@constant('IPS_BASE') == null) {
     define('IPS_BASE', 10000); // Wertebasis f�r Kernel
     define('IPS_MODULBASE', 20000); // Wertebasis f�r Module
 
+    // Service Nachrichten
+    define('IPS_KERNELSTARTED', IPS_BASE + 1);
+    define('IPS_KERNELSHUTDOWN', IPS_BASE + 2);
+
     // Kernel Manager
     define('IPS_KERNELMESSAGE', IPS_BASE + 100);
     define('KR_CREATE', IPS_KERNELMESSAGE + 1); // Kernel wurde erstellt
