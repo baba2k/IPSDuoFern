@@ -4,7 +4,7 @@ require_once(__DIR__ . DIRECTORY_SEPARATOR . "module_private.php");
 require_once(__DIR__ . DIRECTORY_SEPARATOR . "module_public.php");
 
 /**
- * IPSDuofern - Control Rademacher DuoFern devices with IP-Symcon
+ * IPSDuoFern - Control Rademacher DuoFern devices with IP-Symcon
  * Module: DuoFern Gateway
  *
  * @author Sebastian Leicht (baba@baba.tk)
@@ -47,7 +47,7 @@ class DuoFernGateway extends IPSModule
         // create buffers
         $this->ReceiveBuffer = "";
         $this->LastReceiveTimestampBuffer = "";
-        $this->WaitForResponseBuffer = new DuoFernWaitForResponseBuffer ();
+        $this->WaitForResponseBuffer = new DuoFernWaitForResponseBuffer();
         $this->ParentInstanceID = "";
         $this->ChildrenInstanceIDs = array();
     }

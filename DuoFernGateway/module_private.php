@@ -265,7 +265,7 @@ trait PrivateFunction
             return $childrenIds;
         }
 
-        // unregister messagesat old children
+        // unregister messages at old children
         foreach (array_diff($oldChildrenIds, $childrenIds) as $oldChildId) {
             // unregister messages
             if ($oldChildId > 0) {

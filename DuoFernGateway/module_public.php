@@ -13,7 +13,7 @@ trait PublicFunction
      *            message in hex string in format /^[0-9A-F]{44}$/
      * @return string|boolean response if sent, false if not
      */
-    public function SendRawMsgFromGateway(string $msg)
+    public function SendRawMsg(string $msg)
     {
         return $this->SendMsg($msg);
     }
