@@ -174,8 +174,11 @@ class DuoFernConfigurator extends IPSModule
         // get form json as array
         $data = json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . "form.json"), true);
 
+        // set devices count
+        $data['actions'][1]['label'] = sprintf($this->Translate("Devices: %d"), count($deviceList));
+
         // add items to list
-        $data['actions'][0]['values'] = array_merge($data['actions'][0]['values'], array_values($deviceList));
+        $data['actions'][2]['values'] = array_values($deviceList);
 
         return json_encode($data);
     }

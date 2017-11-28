@@ -1,6 +1,14 @@
 {
   "actions": [
     {
+      "type": "Label",
+      "label": "Attention! The configuration form must be reopened to show changes."
+    },
+    {
+      "type": "Label",
+      "label": "Devices: N/A"
+    },
+    {
       "type": "List",
       "name": "deviceList",
       "sort": {

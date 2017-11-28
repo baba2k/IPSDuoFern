@@ -1,12 +1,15 @@
 {
   "translations": {
     "de": {
-      "Type":"Typ",
-      "Unknown":"Unbekannt",
-      "Last Message":"Letzte Nachricht",
-      "InstanceID":"InstanzID",
-      "Find devices":"Suche Geräte",
-      "Message could not be sent":"Nachricht konnte nicht gesendet werden"
+      "Attention! The configuration form must be reopened to show changes.": "Achtung! Das Konfigurationsformular muss neu geöffnet werden, um Änderungen anzuzeigen.",
+      "Devices: N/A": "Geräte: N/A",
+      "Devices: %d": "Geräte: %d",
+      "Type": "Typ",
+      "Unknown": "Unbekannt",
+      "Last Message": "Letzte Nachricht",
+      "InstanceID": "InstanzID",
+      "Find devices": "Suche Geräte",
+      "Message could not be sent": "Nachricht konnte nicht gesendet werden"
     }
   }
 }
