@@ -134,8 +134,9 @@ class DuoFernConfigurator extends IPSModule
                 date('H:i:s', $timeStamp) : date('d.m.Y H:i:s', $timeStamp);
 
             $device = [
-                "duoFernCode" => chunk_split($duoFernCode, 2, " "),
-                "type" => array_key_exists($deviceType, $duoFernDeviceTypes) ? $duoFernDeviceTypes[$deviceType] : $this->Translate("Unknown"),
+                "duoFernCode" => trim(chunk_split($duoFernCode, 2, " ")),
+                "type" => array_key_exists($deviceType, $duoFernDeviceTypes) ?
+                    $duoFernDeviceTypes[$deviceType] : $this->Translate("Unknown"),
                 "name" => IPS_GetLocation($instanceId),
                 "lastMsg" => $timeStamp != null ? $timeString : "N/A",
                 "instanceId" => $instanceId,
@@ -158,8 +159,9 @@ class DuoFernConfigurator extends IPSModule
                 date('H:i:s', $timeStamp) : date('d.m.Y H:i:s', $timeStamp);
 
             $device = [
-                "duoFernCode" => chunk_split($duoFernCode, 2, " "),
-                "type" => array_key_exists($deviceType, $duoFernDeviceTypes) ? $duoFernDeviceTypes[$deviceType] : $this->Translate("Unknown"),
+                "duoFernCode" => trim(chunk_split($duoFernCode, 2, " ")),
+                "type" => array_key_exists($deviceType, $duoFernDeviceTypes) ?
+                    $duoFernDeviceTypes[$deviceType] : $this->Translate("Unknown"),
                 "name" => "N/A",
                 "lastMsg" => $timeStamp != null ? $timeString : "N/A",
                 "instanceId" => "N/A"
@@ -179,6 +181,65 @@ class DuoFernConfigurator extends IPSModule
 
         // add items to list
         $data['actions'][2]['values'] = array_values($deviceList);
+
+        // define onClick method for create instance button
+        $data['actions'][4]['onClick'] = <<< 'EOT'
+                // define helper function to translate
+                function Translate($string)
+                {
+                    $translations = json_decode(file_get_contents(IPS_GetKernelDir()
+                        . DIRECTORY_SEPARATOR . "modules"
+                        . DIRECTORY_SEPARATOR . "IPSDuoFern"
+                        . DIRECTORY_SEPARATOR . "DuoFernConfigurator"
+                        . DIRECTORY_SEPARATOR . "locale.json"), true);
+                    $translations = $translations["translations"]["de"];
+                
+                    // found translation
+                    if (array_key_exists($string, $translations)) {
+                        return $translations[$string];
+                    }
+                
+                    // do not translate
+                    return $string;
+                }
+                
+                // check device has already an instance
+                if ($deviceList == null) {
+                    echo Translate("No DuoFern device selected");
+                    return;
+                }
+                                                
+                // check device has already an instance
+                if ($deviceList['instanceId'] > 0) {
+                    echo Translate("Instance already exists");
+                    return;
+                }
+                
+                // create instance
+                $instanceId = IPS_CreateInstance('{BE62B172-BABA-4EB1-8C4C-507526645ED5}');
+                if ($instanceId == false) {
+                    trigger_error(Translate("Instance could not be created") . PHP_EOL, E_USER_ERROR);
+                    return;
+                }
+                
+                // connect instance to actual gateway if not connected
+                if (IPS_GetInstance($instanceId)['ConnectionID'] != IPS_GetInstance($id)['ConnectionID']) {
+                    if (IPS_GetInstance($instanceId)['ConnectionID'] > 0) {
+                        IPS_DisconnectInstance($instanceId);
+                    }
+                    IPS_ConnectInstance($instanceId, IPS_GetInstance($id)['ConnectionID']);
+                }
+                
+                // set duo fern code property
+                @IPS_SetProperty($instanceId, 'duoFernCode', str_replace(' ', '', $deviceList['duoFernCode']));
+                @IPS_ApplyChanges($instanceId);
+                
+                // set instance name
+                $instanceName = 'DuoFern ' . $deviceList['type'] . ' (' . $deviceList['duoFernCode'] . ')' ;
+                IPS_SetName($instanceId, $instanceName);
+                
+                echo Translate("Instance created") . ": " .  $instanceName;
+EOT;
 
         return json_encode($data);
     }

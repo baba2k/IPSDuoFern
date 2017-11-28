@@ -211,7 +211,6 @@ $duoFernDeviceTypes = [
     "4C" => "Troll Basis DuoFern",
     "4E" => "SX5",
     "61" => "RolloTron Comfort Master",
-    "62" => "Super Fake Device",
     "65" => "Bewegungsmelder",
     "69" => "Umweltsensor",
     "70" => "Troll Comfort DuoFern",
@@ -230,4 +229,5 @@ $duoFernDeviceTypes = [
     "AB" => "Rauchmelder",
     "AD" => "Wandtaster 6fach BAT",
 ];
+
 ?>

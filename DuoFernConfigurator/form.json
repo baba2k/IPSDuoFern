@@ -49,6 +49,11 @@
       "type": "Button",
       "label": "Find devices",
       "onClick": "DUOFERN_SendRawMsgFromConfigurator($id, '0DFF0F400000000000000000000000000000FFFFFF01');"
+    },
+    {
+      "type": "Button",
+      "label": "Create instance",
+      "onClick": ""
     }
   ]
 }

@@ -9,6 +9,11 @@
       "Last Message": "Letzte Nachricht",
       "InstanceID": "InstanzID",
       "Find devices": "Suche Geräte",
+      "Create instance": "Erstelle Instanz",
+      "No DuoFern device selected": "Kein DuoFern Gerät ausgewählt",
+      "Instance already exists": "Instanz ist bereits vorhanden",
+      "Instance could not be created": "Instanz konnte nicht erstellt werden",
+      "Instance created": "Instanz erstellt",
       "Message could not be sent": "Nachricht konnte nicht gesendet werden"
     }
   }
