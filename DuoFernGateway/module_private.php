@@ -72,7 +72,7 @@ trait PrivateFunction
             $this->SendDebug("INIT SUCCESS", $this->ConvertMsgToSend("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"), 1);
 
             // set instance status to active
-            $this->SetStatus(IPSStatus::IS_ACTIVE);
+            $this->SetStatus(IS_ACTIVE);
 
             return true;
         }
@@ -227,13 +227,13 @@ trait PrivateFunction
         // unregister messages at old parent
         if ($oldParentId > 0) {
             // unregister messages
-            $this->UnregisterMessage($oldParentId, IPSMessage::IM_CHANGESTATUS);
+            $this->UnregisterMessage($oldParentId, IM_CHANGESTATUS);
         }
 
         // register messages at new parent
         if ($parentId > 0) {
             // register messages
-            $this->RegisterMessage($parentId, IPSMessage::IM_CHANGESTATUS);
+            $this->RegisterMessage($parentId, IM_CHANGESTATUS);
         } else {
             $parentId = 0;
         }
@@ -270,8 +270,8 @@ trait PrivateFunction
             // unregister messages
             if ($oldChildId > 0) {
                 IPS_LogMessage("DuoFernGateway", "UpdateChildrenData() -> Unregistered child: " . $oldChildId);
-                $this->UnregisterMessage($oldChildId, IPSMessage::IM_CHANGESETTINGS);
-                $this->UnregisterMessage($oldChildId, IPSMessage::FM_DISCONNECT);
+                $this->UnregisterMessage($oldChildId, IM_CHANGESETTINGS);
+                $this->UnregisterMessage($oldChildId, FM_DISCONNECT);
             }
         }
 
@@ -280,8 +280,8 @@ trait PrivateFunction
             // register messages
             if ($childId > 0) {
                 IPS_LogMessage("DuoFernGateway", "UpdateChildrenData() -> Registered child: " . $childId);
-                $this->RegisterMessage($childId, IPSMessage::IM_CHANGESETTINGS);
-                $this->RegisterMessage($childId, IPSMessage::FM_DISCONNECT);
+                $this->RegisterMessage($childId, IM_CHANGESETTINGS);
+                $this->RegisterMessage($childId, FM_DISCONNECT);
             }
         }
 

@@ -17,8 +17,8 @@ class DuoFernDevice extends IPSModule
      *
      * @var int
      */
-    const IS_INVALID_DUOFERN_CODE = IPSStatus::IS_EBASE + 1;
-    const IS_DEVICE_NOT_AVAILABLE = IPSStatus::IS_EBASE + 2;
+    const IS_INVALID_DUOFERN_CODE = IS_EBASE + 1;
+    const IS_DEVICE_NOT_AVAILABLE = IS_EBASE + 2;
 
     /**
      * Traits
@@ -46,14 +46,14 @@ class DuoFernDevice extends IPSModule
     public function ApplyChanges()
     {
         // register messages
-        $this->RegisterMessage(0, IPSMessage::IPS_KERNELSTARTED);
-        $this->RegisterMessage($this->InstanceID, IPSMessage::FM_CONNECT);
+        $this->RegisterMessage(0, IPS_KERNELSTARTED);
+        $this->RegisterMessage($this->InstanceID, FM_CONNECT);
 
         // call parent
         parent::ApplyChanges();
 
         // return when kernel is not ready
-        if (IPS_GetKernelRunlevel() != IPSMessage::KR_READY) {
+        if (IPS_GetKernelRunlevel() != KR_READY) {
             return;
         }
 
@@ -66,7 +66,7 @@ class DuoFernDevice extends IPSModule
             $this->SetStatus(self::IS_INVALID_DUOFERN_CODE);
             $duoFernCode = "XXXXXX"; // set invalid duoFernCode for receive data filter
         } else if ($this->GetStatus() == self::IS_INVALID_DUOFERN_CODE) {
-            $this->SetStatus(IPSStatus::IS_ACTIVE);
+            $this->SetStatus(IS_ACTIVE);
         }
 
         // set receive data filter
@@ -92,7 +92,7 @@ class DuoFernDevice extends IPSModule
         $this->SendDebug("RECEIVED", $msg, 1);
 
         // set status to active
-        $this->SetStatus(IPSStatus::IS_ACTIVE);
+        $this->SetStatus(IS_ACTIVE);
     }
 
     /**
@@ -108,7 +108,7 @@ class DuoFernDevice extends IPSModule
         if (!$this->IsParentInstanceActive() || $this->GetStatus() == self::IS_INVALID_DUOFERN_CODE) {
             $this->SendDebug("DISCARD TRANSMIT", $Data, 1);
             // set status to device not available
-            if ($this->GetStatus() == IPSStatus::IS_ACTIVE) {
+            if ($this->GetStatus() == IS_ACTIVE) {
                 $this->SetStatus(self::IS_DEVICE_NOT_AVAILABLE);
             }
             // trigger error
@@ -143,7 +143,7 @@ class DuoFernDevice extends IPSModule
         }
 
         // set status active
-        $this->SetStatus(IPSStatus::IS_ACTIVE);
+        $this->SetStatus(IS_ACTIVE);
 
         return $result;
     }
@@ -177,10 +177,10 @@ class DuoFernDevice extends IPSModule
     {
         IPS_LogMessage("DuoFernDevice", "MessageSink() -> Message from SenderID " . $SenderID . " with Message " . $Message);
         switch ($Message) {
-            case IPSMessage::IPS_KERNELSTARTED :
+            case IPS_KERNELSTARTED :
                 $this->ApplyChanges();
                 break;
-            case IPSMessage::FM_CONNECT :
+            case FM_CONNECT :
                 $this->SendForceRefresh();
                 break;
         }
