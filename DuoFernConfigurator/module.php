@@ -1,5 +1,5 @@
 <?
-require_once(__DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "library.php");
+require_once(__DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "libs" . DIRECTORY_SEPARATOR . "library.php");
 require_once(__DIR__ . DIRECTORY_SEPARATOR . "module_private.php");
 require_once(__DIR__ . DIRECTORY_SEPARATOR . "module_public.php");
 
@@ -98,7 +98,7 @@ class DuoFernConfigurator extends IPSModule
         }
 
         // send msg as debug msg
-        if (strcmp($this->ConvertMsgToDisplay($Data), DUOFERN_MSG_ACK) === 0) {
+        if (strcmp($this->ConvertMsgToDisplay($Data), DuoFernMessage::DUOFERN_MSG_ACK) === 0) {
             $this->SendDebug("TRANSMIT ACK", $Data, 1);
         } else {
             $this->SendDebug("TRANSMIT", $Data, 1);
@@ -114,7 +114,6 @@ class DuoFernConfigurator extends IPSModule
      */
     public function GetConfigurationForm()
     {
-        global $duoFernDeviceTypes;
         $deviceInstanceIds = IPS_GetInstanceListByModuleID("{BE62B172-BABA-4EB1-8C4C-507526645ED5}");
         $parentId = IPS_GetInstance($this->InstanceID)['ConnectionID'];
         $deviceList = array();
@@ -128,15 +127,15 @@ class DuoFernConfigurator extends IPSModule
             }
 
             $duoFernCode = IPS_GetProperty($instanceId, "duoFernCode");
-            $deviceType = substr($duoFernCode, 0, 2);
+            $deviceTypeCode = substr($duoFernCode, 0, 2);
+            $deviceType = DuoFernDeviceType::getDeviceType($deviceTypeCode);
             $timeStamp = isset ($seenDevicesBuffer[$duoFernCode]) ? $seenDevicesBuffer[$duoFernCode] : null;
             $timeString = date('Ymd') == date('Ymd', $timeStamp) && $timeStamp != null ?
                 date('H:i:s', $timeStamp) : date('d.m.Y H:i:s', $timeStamp);
 
             $device = [
                 "duoFernCode" => trim(chunk_split($duoFernCode, 2, " ")),
-                "type" => array_key_exists($deviceType, $duoFernDeviceTypes) ?
-                    $duoFernDeviceTypes[$deviceType] : $this->Translate("Unknown"),
+                "type" => $deviceType != null ? $deviceType : $this->Translate("Unknown"),
                 "name" => IPS_GetLocation($instanceId),
                 "lastMsg" => $timeStamp != null ? $timeString : "N/A",
                 "instanceId" => $instanceId,
@@ -153,15 +152,15 @@ class DuoFernConfigurator extends IPSModule
                 continue;
             }
 
-            $deviceType = substr($duoFernCode, 0, 2);
+            $deviceTypeCode = substr($duoFernCode, 0, 2);
+            $deviceType = DuoFernDeviceType::getDeviceType($deviceTypeCode);
             $timeStamp = isset ($seenDevicesBuffer[$duoFernCode]) ? $seenDevicesBuffer[$duoFernCode] : null;
             $timeString = date('Ymd') == date('Ymd', $timeStamp) && $timeStamp != null ?
                 date('H:i:s', $timeStamp) : date('d.m.Y H:i:s', $timeStamp);
 
             $device = [
                 "duoFernCode" => trim(chunk_split($duoFernCode, 2, " ")),
-                "type" => array_key_exists($deviceType, $duoFernDeviceTypes) ?
-                    $duoFernDeviceTypes[$deviceType] : $this->Translate("Unknown"),
+                "type" => $deviceType != null ? $deviceType : $this->Translate("Unknown"),
                 "name" => "N/A",
                 "lastMsg" => $timeStamp != null ? $timeString : "N/A",
                 "instanceId" => "N/A"
@@ -184,9 +183,10 @@ class DuoFernConfigurator extends IPSModule
 
         // define onClick method for search devices button
         $data['actions'][3]['onClick'] = <<< 'EOT'
-                // include library constants
+                // include library
                 require_once(IPS_GetKernelDir() . DIRECTORY_SEPARATOR . "modules"
                                                 . DIRECTORY_SEPARATOR . "IPSDuoFern"
+                                                . DIRECTORY_SEPARATOR . "libs"
                                                 . DIRECTORY_SEPARATOR . "library.php");
 
                 // define helper function to translate
@@ -208,7 +208,7 @@ class DuoFernConfigurator extends IPSModule
                     return $string;
                 }
                 
-                DUOFERN_SendRawMsg($id, DUOFERN_MSG_GET_ALL_DEVICES_STATUS);
+                DUOFERN_SendRawMsg($id, DuoFernMessage::DUOFERN_MSG_GET_ALL_DEVICES_STATUS);
                 echo Translate("Search for devices...");
 EOT;
 

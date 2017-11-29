@@ -25,36 +25,36 @@ trait PrivateFunction
             $this->SendDebug("INIT START", $this->ConvertMsgToSend("00000000000000000000000000000000000000000000"), 1);
 
             // init 1
-            $response = $this->SendMsg(DUOFERN_MSG_INIT_1);
-            if ($response !== $this->ExpectedResponse(DUOFERN_MSG_INIT_1)) {
+            $response = $this->SendMsg(DuoFernMessage::DUOFERN_MSG_INIT_1);
+            if ($response !== $this->ExpectedResponse(DuoFernMessage::DUOFERN_MSG_INIT_1)) {
                 $this->SendDebug("INIT FAIL", $this->ConvertMsgToSend($response), 1);
                 continue;
             }
 
             // init 2
-            $response = $this->SendMsg(DUOFERN_MSG_INIT_2);
-            if ($response !== $this->ExpectedResponse(DUOFERN_MSG_INIT_2)) {
+            $response = $this->SendMsg(DuoFernMessage::DUOFERN_MSG_INIT_2);
+            if ($response !== $this->ExpectedResponse(DuoFernMessage::DUOFERN_MSG_INIT_2)) {
                 $this->SendDebug("INIT FAIL", $this->ConvertMsgToSend($response), 1);
                 continue;
             }
 
             // init serial
-            $response = $this->SendMsg($this->MsgInitSerial($gatewayDuoFernCode));
-            if ($response !== $this->ExpectedResponse($this->MsgInitSerial($gatewayDuoFernCode))) {
+            $response = $this->SendMsg(DuoFernMessage::MsgInitSerial($gatewayDuoFernCode));
+            if ($response !== $this->ExpectedResponse(DuoFernMessage::MsgInitSerial($gatewayDuoFernCode))) {
                 $this->SendDebug("INIT FAIL", $this->ConvertMsgToSend($response), 1);
                 continue;
             }
 
             // init 3
-            $response = $this->SendMsg(DUOFERN_MSG_INIT_3);
-            if ($response !== $this->ExpectedResponse(DUOFERN_MSG_INIT_3)) {
+            $response = $this->SendMsg(DuoFernMessage::DUOFERN_MSG_INIT_3);
+            if ($response !== $this->ExpectedResponse(DuoFernMessage::DUOFERN_MSG_INIT_3)) {
                 $this->SendDebug("INIT FAIL", $this->ConvertMsgToSend($response), 1);
                 continue;
             }
 
-            // init pairtable
+            // init pair table
             foreach ($deviceDuoFernCodes as $number => $deviceDuoFernCode) {
-                $msg = $this->MsgInitPairtable($number, $deviceDuoFernCode);
+                $msg = DuoFernMessage::MsgInitPairtable($number, $deviceDuoFernCode);
                 $response = $this->SendMsg($msg);
                 if ($response !== $this->ExpectedResponse($msg)) {
                     $this->SendDebug("INIT FAIL", $this->ConvertMsgToSend($response), 1);
@@ -63,8 +63,8 @@ trait PrivateFunction
             }
 
             // init end
-            $response = $this->SendMsg(DUOFERN_MSG_INIT_END);
-            if ($response !== $this->ExpectedResponse(DUOFERN_MSG_INIT_END)) {
+            $response = $this->SendMsg(DuoFernMessage::DUOFERN_MSG_INIT_END);
+            if ($response !== $this->ExpectedResponse(DuoFernMessage::DUOFERN_MSG_INIT_END)) {
                 $this->SendDebug("INIT FAIL", $this->ConvertMsgToSend($response), 1);
                 continue;
             }
@@ -72,7 +72,7 @@ trait PrivateFunction
             $this->SendDebug("INIT SUCCESS", $this->ConvertMsgToSend("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"), 1);
 
             // set instance status to active
-            $this->SetStatus(IS_ACTIVE);
+            $this->SetStatus(IPSStatus::IS_ACTIVE);
 
             return true;
         }
@@ -93,12 +93,12 @@ trait PrivateFunction
     private function SendMsg($msg)
     {
         // check valid msg
-        if (!preg_match(DUOFERN_REGEX_MSG, $msg)) {
+        if (!preg_match(DuoFernRegex::DUOFERN_REGEX_MSG, $msg)) {
             return false;
         }
 
         // ACK has no answer
-        if (strcmp($msg, DUOFERN_MSG_ACK) === 0) {
+        if (strcmp($msg, DuoFernMessage::DUOFERN_MSG_ACK) === 0) {
             // convert data from hex to string
             $data = $this->ConvertMsgToSend($msg);
 
@@ -145,7 +145,7 @@ trait PrivateFunction
     private function WaitForResponse($expectedResponse)
     {
         // check valid msg
-        if (!preg_match(DUOFERN_REGEX_MSG, $expectedResponse)) {
+        if (!preg_match(DuoFernRegex::DUOFERN_REGEX_MSG, $expectedResponse)) {
             return false;
         }
 
@@ -158,7 +158,7 @@ trait PrivateFunction
             if ($response !== false) {
                 if ($this->SemaphoreEnter('WaitForResponseBuffer')) {
                     $waitForResponseBuffer = $this->WaitForResponseBuffer;
-                    $blub = $waitForResponseBuffer->Remove($expectedResponse);
+                    $waitForResponseBuffer->Remove($expectedResponse);
                     $this->WaitForResponseBuffer = $waitForResponseBuffer;
                     $this->SemaphoreLeave('WaitForResponseBuffer');
                     // $this->SendDebug ( "RECEIVED RESPONSE", $this->ConvertMsgToSend ( $expectedResponse ), 1 );
@@ -195,7 +195,7 @@ trait PrivateFunction
     private function WaitForResponseOf($msg)
     {
         // check valid msg
-        if (!preg_match(DUOFERN_REGEX_MSG, $msg)) {
+        if (!preg_match(DuoFernRegex::DUOFERN_REGEX_MSG, $msg)) {
             return false;
         }
 
@@ -227,13 +227,13 @@ trait PrivateFunction
         // unregister messages at old parent
         if ($oldParentId > 0) {
             // unregister messages
-            $this->UnregisterMessage($oldParentId, IM_CHANGESTATUS);
+            $this->UnregisterMessage($oldParentId, IPSMessage::IM_CHANGESTATUS);
         }
 
         // register messages at new parent
         if ($parentId > 0) {
             // register messages
-            $this->RegisterMessage($parentId, IM_CHANGESTATUS);
+            $this->RegisterMessage($parentId, IPSMessage::IM_CHANGESTATUS);
         } else {
             $parentId = 0;
         }
@@ -269,7 +269,7 @@ trait PrivateFunction
         foreach (array_diff($oldChildrenIds, $childrenIds) as $oldChildId) {
             // unregister messages
             if ($oldChildId > 0) {
-                $this->UnregisterMessage($oldChildId, IM_CHANGESETTINGS);
+                $this->UnregisterMessage($oldChildId, IPSMessage::IM_CHANGESETTINGS);
             }
         }
 
@@ -277,7 +277,7 @@ trait PrivateFunction
         foreach (array_diff($childrenIds, $oldChildrenIds) as $childId) {
             // register messages
             if ($childId > 0) {
-                $this->RegisterMessage($childId, IM_CHANGESETTINGS);
+                $this->RegisterMessage($childId, IPSMessage::IM_CHANGESETTINGS);
             }
         }
 
@@ -327,7 +327,7 @@ trait PrivateFunction
             $duoFernCode = IPS_GetProperty($childId, "duoFernCode");
 
             // add duo fern code to array
-            if ($duoFernCode !== false && preg_match(DUOFERN_REGEX_DUOFERN_CODE, $duoFernCode)) {
+            if ($duoFernCode !== false && preg_match(DuoFernRegex::DUOFERN_REGEX_DUOFERN_CODE, $duoFernCode)) {
                 $duoFernCodes [sprintf("%02X", $i++)] = $duoFernCode;
             }
         }

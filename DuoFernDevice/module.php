@@ -1,5 +1,5 @@
 <?
-require_once(__DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "library.php");
+require_once(__DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "libs" . DIRECTORY_SEPARATOR . "library.php");
 require_once(__DIR__ . DIRECTORY_SEPARATOR . "module_private.php");
 require_once(__DIR__ . DIRECTORY_SEPARATOR . "module_public.php");
 
@@ -17,8 +17,8 @@ class DuoFernDevice extends IPSModule
      *
      * @var int
      */
-    const IS_INVALID_DUOFERN_CODE = IS_EBASE + 1;
-    const IS_DEVICE_NOT_AVAILABLE = IS_EBASE + 2;
+    const IS_INVALID_DUOFERN_CODE = IPSStatus::IS_EBASE + 1;
+    const IS_DEVICE_NOT_AVAILABLE = IPSStatus::IS_EBASE + 2;
 
     /**
      * Traits
@@ -52,11 +52,11 @@ class DuoFernDevice extends IPSModule
 
         // property duoFernCode
         $duoFernCode = $this->ReadPropertyString("duoFernCode");
-        if (!preg_match(DUOFERN_REGEX_DUOFERN_CODE, $duoFernCode)) {
+        if (!preg_match(DuoFernRegex::DUOFERN_REGEX_DUOFERN_CODE, $duoFernCode)) {
             $this->SetStatus(self::IS_INVALID_DUOFERN_CODE);
             $duoFernCode = "XXXXXX"; // set invalid duoFernCode for receive data filter
         } else if ($this->GetStatus() == self::IS_INVALID_DUOFERN_CODE) {
-            $this->SetStatus(IS_ACTIVE);
+            $this->SetStatus(IPSStatus::IS_ACTIVE);
         }
 
         // set receive data filter
@@ -82,7 +82,7 @@ class DuoFernDevice extends IPSModule
         $this->SendDebug("RECEIVED", $msg, 1);
 
         // set status to active
-        $this->SetStatus(IS_ACTIVE);
+        $this->SetStatus(IPSStatus::IS_ACTIVE);
     }
 
     /**
@@ -98,7 +98,7 @@ class DuoFernDevice extends IPSModule
         if (!$this->IsParentInstanceActive() || $this->GetStatus() == self::IS_INVALID_DUOFERN_CODE) {
             $this->SendDebug("DISCARD TRANSMIT", $Data, 1);
             // set status to device not available
-            if ($this->GetStatus() == IS_ACTIVE) {
+            if ($this->GetStatus() == IPSStatus::IS_ACTIVE) {
                 $this->SetStatus(self::IS_DEVICE_NOT_AVAILABLE);
             }
             // trigger error
@@ -126,14 +126,14 @@ class DuoFernDevice extends IPSModule
         }
 
         // send msg as debug msg
-        if (strcmp($this->ConvertMsgToDisplay($Data), DUOFERN_MSG_ACK) === 0) {
+        if (strcmp($this->ConvertMsgToDisplay($Data), DuoFernMessage::DUOFERN_MSG_ACK) === 0) {
             $this->SendDebug("TRANSMIT ACK", $Data, 1);
         } else {
             $this->SendDebug("TRANSMIT", $Data, 1);
         }
 
         // set status active
-        $this->SetStatus(IS_ACTIVE);
+        $this->SetStatus(IPSStatus::IS_ACTIVE);
 
         return $result;
     }

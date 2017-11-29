@@ -1,5 +1,5 @@
 <?
-require_once(__DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "library.php");
+require_once(__DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "libs" . DIRECTORY_SEPARATOR . "library.php");
 require_once(__DIR__ . DIRECTORY_SEPARATOR . "module_private.php");
 require_once(__DIR__ . DIRECTORY_SEPARATOR . "module_public.php");
 
@@ -17,8 +17,8 @@ class DuoFernGateway extends IPSModule
      *
      * @var int
      */
-    const IS_INVALID_DUOFERN_CODE = IS_EBASE + 1;
-    const IS_INIT_FAILED = IS_EBASE + 2;
+    const IS_INVALID_DUOFERN_CODE = IPSStatus::IS_EBASE + 1;
+    const IS_INIT_FAILED = IPSStatus::IS_EBASE + 2;
 
     /**
      * Traits
@@ -59,15 +59,15 @@ class DuoFernGateway extends IPSModule
     public function ApplyChanges()
     {
         // register messages
-        $this->RegisterMessage(0, IPS_KERNELSTARTED);
-        $this->RegisterMessage($this->InstanceID, FM_CONNECT);
-        $this->RegisterMessage($this->InstanceID, FM_DISCONNECT);
+        $this->RegisterMessage(0, IPSMessage::IPS_KERNELSTARTED);
+        $this->RegisterMessage($this->InstanceID, IPSMessage::FM_CONNECT);
+        $this->RegisterMessage($this->InstanceID, IPSMessage::FM_DISCONNECT);
 
         // call parent
         parent::ApplyChanges();
 
         // return when kernel is not ready
-        if (IPS_GetKernelRunlevel() != KR_READY) {
+        if (IPS_GetKernelRunlevel() != IPSMessage::KR_READY) {
             return;
         }
 
@@ -83,10 +83,10 @@ class DuoFernGateway extends IPSModule
 
         // property duoFernCode
         $duoFernCode = $this->ReadPropertyString("duoFernCode");
-        if (!preg_match(DUOFERN_REGEX_GATEWAY_DUOFERN_CODE, $duoFernCode)) {
+        if (!preg_match(DuoFernRegex::DUOFERN_REGEX_GATEWAY_DUOFERN_CODE, $duoFernCode)) {
             $this->SetStatus(self::IS_INVALID_DUOFERN_CODE);
         } else if ($this->GetStatus() == self::IS_INVALID_DUOFERN_CODE) {
-            $this->SetStatus(IS_ACTIVE);
+            $this->SetStatus(IPSStatus::IS_ACTIVE);
         }
 
         // set duo fern code status variable
@@ -132,7 +132,7 @@ class DuoFernGateway extends IPSModule
             $receiveBuffer = substr($receiveBuffer, 22);
 
             // ack / response msg
-            if (preg_match(DUOFERN_REGEX_ACK, $displayMsg)) {
+            if (preg_match(DuoFernRegex::DUOFERN_REGEX_ACK, $displayMsg)) {
                 $waitForResponseBuffer = $this->WaitForResponseBuffer;
                 $waitForResponseBuffer->Add($displayMsg);
                 $this->WaitForResponseBuffer = $waitForResponseBuffer;
@@ -148,8 +148,8 @@ class DuoFernGateway extends IPSModule
             }
 
             // send ack
-            if (strcmp($displayMsg, DUOFERN_MSG_ACK) !== 0) {
-                $this->SendMsg(DUOFERN_MSG_ACK);
+            if (strcmp($displayMsg, DuoFernMessage::DUOFERN_MSG_ACK) !== 0) {
+                $this->SendMsg(DuoFernMessage::DUOFERN_MSG_ACK);
             }
         }
 
@@ -212,7 +212,7 @@ class DuoFernGateway extends IPSModule
         }
 
         // send msg as debug msg
-        if (strcmp($this->ConvertMsgToDisplay($Data), DUOFERN_MSG_ACK) === 0) {
+        if (strcmp($this->ConvertMsgToDisplay($Data), DuoFernMessage::DUOFERN_MSG_ACK) === 0) {
             $this->SendDebug("TRANSMIT ACK", $Data, 1);
         } else {
             $this->SendDebug("TRANSMIT", $Data, 1);
@@ -234,19 +234,19 @@ class DuoFernGateway extends IPSModule
     {
         IPS_LogMessage("MessageSink", "Message from SenderID " . $SenderID . " with Message " . $Message . "\r\n Data: " . print_r($Data, true));
         switch ($Message) {
-            case IPS_KERNELSTARTED :
+            case IPSMessage::IPS_KERNELSTARTED :
                 $this->ApplyChanges();
                 break;
-            case FM_CONNECT :
-            case FM_DISCONNECT :
+            case IPSMessage::FM_CONNECT :
+            case IPSMessage::FM_DISCONNECT :
                 $this->ForceRefresh();
                 break;
-            case IM_CHANGESTATUS :
-                if (($SenderID == @IPS_GetInstance($this->InstanceID) ['ConnectionID']) and ($Data [0] == IS_ACTIVE)) {
+            case IPSMessage::IM_CHANGESTATUS :
+                if (($SenderID == @IPS_GetInstance($this->InstanceID) ['ConnectionID']) and ($Data [0] == IPSStatus::IS_ACTIVE)) {
                     $this->ForceRefresh();
                 }
                 break;
-            case IM_CHANGESETTINGS :
+            case IPSMessage::IM_CHANGESETTINGS :
                 // check changed properties
                 foreach ($Data as $changedPropertyJson) {
                     $changedProperty = json_decode($changedPropertyJson, true);
@@ -254,7 +254,7 @@ class DuoFernGateway extends IPSModule
                     if (is_array($changedProperty) && array_key_exists("duoFernCode", $changedProperty)) {
                         $duoFernCode = $changedProperty["duoFernCode"];
                         // valid duo fern code
-                        if (preg_match(DUOFERN_REGEX_DUOFERN_CODE, $duoFernCode)) {
+                        if (preg_match(DuoFernRegex::DUOFERN_REGEX_DUOFERN_CODE, $duoFernCode)) {
                             $this->ForceRefresh();
                             break;
                         }
