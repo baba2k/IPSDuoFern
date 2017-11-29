@@ -108,6 +108,13 @@ class DuoFernGateway extends IPSModule
         // decode data
         $data = json_decode($JSONString);
 
+        // TODO: catch ForceRefresh from children
+        if (utf8_decode($data->Buffer) == "ForceRefresh") {
+            IPS_LogMessage("DuoFernGateway", "Got ForceRefresh from a child");
+            $this->ForceRefresh();
+            return;
+        }
+
         // get buffers
         $receiveBuffer = $this->ReceiveBuffer;
         $lastReceiveTimestampBuffer = $this->LastReceiveTimestampBuffer;
@@ -232,7 +239,7 @@ class DuoFernGateway extends IPSModule
      */
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
     {
-        IPS_LogMessage("MessageSink", "Message from SenderID " . $SenderID . " with Message " . $Message . "\r\n Data: " . print_r($Data, true));
+        IPS_LogMessage("DuoFernGateway", "MessageSink() -> Message from SenderID " . $SenderID . " with Message " . $Message);
         switch ($Message) {
             case IPSMessage::IPS_KERNELSTARTED :
                 $this->ApplyChanges();

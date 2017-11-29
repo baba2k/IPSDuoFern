@@ -45,7 +45,17 @@ class DuoFernDevice extends IPSModule
      */
     public function ApplyChanges()
     {
+        // register messages
+        $this->RegisterMessage(0, IPSMessage::IPS_KERNELSTARTED);
+        $this->RegisterMessage($this->InstanceID, IPSMessage::FM_CONNECT);
+
+        // call parent
         parent::ApplyChanges();
+
+        // return when kernel is not ready
+        if (IPS_GetKernelRunlevel() != IPSMessage::KR_READY) {
+            return;
+        }
 
         // require gateway as parent
         $this->ConnectParent("{7AB07511-BABA-418B-81C5-88A7C709D318}");
@@ -107,7 +117,7 @@ class DuoFernDevice extends IPSModule
             return false;
         }
 
-        // send to parent io
+        // send to parent splitter
         $result = parent::SendDataToParent(json_encode(Array(
             "DataID" => "{D608631B-BABA-4D08-ADB0-5364DD6A2526}",
             "Buffer" => utf8_encode($Data)
@@ -136,6 +146,44 @@ class DuoFernDevice extends IPSModule
         $this->SetStatus(IPSStatus::IS_ACTIVE);
 
         return $result;
+    }
+
+    /**
+     * Sends a force refresh request to gateway
+     * @return string|bool
+     */
+    private function SendForceRefresh()
+    {
+        $result = parent::SendDataToParent(json_encode(Array(
+            "DataID" => "{D608631B-BABA-4D08-ADB0-5364DD6A2526}",
+            "Buffer" => utf8_encode("ForceRefresh")
+        )));
+
+        IPS_LogMessage("DuoFernDevice", "SendForceRefresh()");
+
+        return $result;
+    }
+
+    /**
+     * Handles registered messages
+     * Will be called when receiving a registered msg
+     *
+     * @param int $TimeStamp
+     * @param int $SenderID
+     * @param string $Message
+     * @param array $Data
+     */
+    public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
+    {
+        IPS_LogMessage("DuoFernDevice", "MessageSink() -> Message from SenderID " . $SenderID . " with Message " . $Message);
+        switch ($Message) {
+            case IPSMessage::IPS_KERNELSTARTED :
+                $this->ApplyChanges();
+                break;
+            case IPSMessage::FM_CONNECT :
+                $this->SendForceRefresh();
+                break;
+        }
     }
 }
 

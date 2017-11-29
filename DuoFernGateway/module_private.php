@@ -254,9 +254,9 @@ trait PrivateFunction
         $childrenIds = IPS_GetInstanceListByModuleID("{BE62B172-BABA-4EB1-8C4C-507526645ED5}");
 
         // ignore instances if they are not children
-        foreach ($childrenIds as &$childId) {
+        foreach ($childrenIds as $key => $childId) {
             if (IPS_GetInstance($childId) ['ConnectionID'] != $this->InstanceID) {
-                unset ($childrenIds [$childId]);
+                unset($childrenIds[$key]);
             }
         }
 
@@ -269,7 +269,9 @@ trait PrivateFunction
         foreach (array_diff($oldChildrenIds, $childrenIds) as $oldChildId) {
             // unregister messages
             if ($oldChildId > 0) {
+                IPS_LogMessage("DuoFernGateway", "UpdateChildrenData() -> Unregistered child: " . $oldChildId);
                 $this->UnregisterMessage($oldChildId, IPSMessage::IM_CHANGESETTINGS);
+                $this->UnregisterMessage($oldChildId, IPSMessage::FM_DISCONNECT);
             }
         }
 
@@ -277,7 +279,9 @@ trait PrivateFunction
         foreach (array_diff($childrenIds, $oldChildrenIds) as $childId) {
             // register messages
             if ($childId > 0) {
+                IPS_LogMessage("DuoFernGateway", "UpdateChildrenData() -> Registered child: " . $childId);
                 $this->RegisterMessage($childId, IPSMessage::IM_CHANGESETTINGS);
+                $this->RegisterMessage($childId, IPSMessage::FM_DISCONNECT);
             }
         }
 
@@ -291,12 +295,15 @@ trait PrivateFunction
      */
     private function ForceRefresh()
     {
+        IPS_LogMessage("DuoFernGateway", "ForceRefresh()");
+
         // update children data and register/unregister msgs
         $this->UpdateChildrenData();
 
         // update parent data and register/unregister msgs
         if ($this->UpdateParentData() != 0 && $this->IsInstanceActive() && $this->IsParentInstanceActive()) {
             // initiates the duo fern connection
+            IPS_LogMessage("DuoFernGateway", "Init()");
             $this->Init();
         }
     }
