@@ -72,7 +72,7 @@ trait IPSHelpFunction
      */
     private function IsInstanceActive()
     {
-        return IPS_GetInstance($this->InstanceID) ['InstanceStatus'] == IPSStatus::IS_ACTIVE ? true : false;
+        return IPS_GetInstance($this->InstanceID) ['InstanceStatus'] == IS_ACTIVE ? true : false;
     }
 
     /**
@@ -85,7 +85,7 @@ trait IPSHelpFunction
         $instance = IPS_GetInstance($this->InstanceID);
         if ($instance ['ConnectionID'] > 0) {
             $parent = IPS_GetInstance($instance ['ConnectionID']);
-            if ($parent ['InstanceStatus'] == IPSStatus::IS_ACTIVE) {
+            if ($parent ['InstanceStatus'] == IS_ACTIVE) {
                 return true;
             }
         }
