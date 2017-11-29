@@ -39,7 +39,7 @@ class DuoFernDeviceType
 
     public static function getDeviceType($deviceTypeCode)
     {
-        return self::$duoFernDeviceTypes[$deviceTypeCode];
+        return isset(self::$duoFernDeviceTypes[$deviceTypeCode]) ? self::$duoFernDeviceTypes[$deviceTypeCode] : null;
     }
 }
 
