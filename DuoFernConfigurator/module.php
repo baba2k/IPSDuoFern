@@ -40,7 +40,7 @@ class DuoFernConfigurator extends IPSModule
         parent::ApplyChanges();
 
         // require gateway as parent
-        $this->ForceParent("{7AB07511-BABA-418B-81C5-88A7C709D318}");
+        $this->ConnectParent("{7AB07511-BABA-418B-81C5-88A7C709D318}");
     }
 
     /**
