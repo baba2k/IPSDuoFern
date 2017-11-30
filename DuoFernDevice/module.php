@@ -149,17 +149,17 @@ class DuoFernDevice extends IPSModule
     }
 
     /**
-     * Sends a force refresh request to gateway
+     * Sends a UpdateChildrenData request to gateway
      * @return string|bool
      */
-    private function SendForceRefresh()
+    private function SendUpdateChildrenData()
     {
         $result = parent::SendDataToParent(json_encode(Array(
             "DataID" => "{D608631B-BABA-4D08-ADB0-5364DD6A2526}",
-            "Buffer" => utf8_encode("ForceRefresh")
+            "UpdateChildrenData" => utf8_encode("true")
         )));
 
-        IPS_LogMessage("DuoFernDevice", "SendForceRefresh()");
+        IPS_LogMessage("DuoFernDevice", "SendUpdateChildrenData()");
 
         return $result;
     }
@@ -181,7 +181,7 @@ class DuoFernDevice extends IPSModule
                 $this->ApplyChanges();
                 break;
             case FM_CONNECT :
-                $this->SendForceRefresh();
+                $this->SendUpdateChildrenData();
                 break;
         }
     }

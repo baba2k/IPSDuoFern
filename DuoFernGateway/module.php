@@ -108,13 +108,6 @@ class DuoFernGateway extends IPSModule
         // decode data
         $data = json_decode($JSONString);
 
-        // TODO: catch ForceRefresh from children
-        if (utf8_decode($data->Buffer) == "ForceRefresh") {
-            IPS_LogMessage("DuoFernGateway", "Got ForceRefresh from a child");
-            $this->ForceRefresh();
-            return;
-        }
-
         // get buffers
         $receiveBuffer = $this->ReceiveBuffer;
         $lastReceiveTimestampBuffer = $this->LastReceiveTimestampBuffer;
@@ -178,6 +171,13 @@ class DuoFernGateway extends IPSModule
     {
         // decode data
         $data = json_decode($JSONString);
+
+        // catch UpdateChildrenData from children
+        if (isset ($data->UpdateChildrenData) && $data->UpdateChildrenData == "true") {
+            IPS_LogMessage("DuoFernGateway", "Got UpdateChildrenData from a child");
+            $this->UpdateChildrenData();
+            return "UpdateChildrenData";
+        }
 
         // get msg
         $msg = $this->ConvertMsgToDisplay(utf8_decode($data->Buffer));
