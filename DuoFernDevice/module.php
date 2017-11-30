@@ -104,13 +104,11 @@ class DuoFernDevice extends IPSModule
      */
     protected function SendDataToParent($Data)
     {
-        // discard if no active parent
-        if (!$this->IsParentInstanceActive() || $this->GetStatus() == self::IS_INVALID_DUOFERN_CODE) {
+        // discard if no active parent or grand parent or invalid duo fern code
+        if (!$this->IsParentInstanceActive() || !$this->IsGrandParentInstanceActive()
+            || $this->GetStatus() == self::IS_INVALID_DUOFERN_CODE) {
             $this->SendDebug("DISCARD TRANSMIT", $Data, 1);
-            // set status to device not available
-            if ($this->GetStatus() == IS_ACTIVE) {
-                $this->SetStatus(self::IS_DEVICE_NOT_AVAILABLE);
-            }
+
             // trigger error
             trigger_error($this->Translate("Message could not be sent") . PHP_EOL, E_USER_ERROR);
 
