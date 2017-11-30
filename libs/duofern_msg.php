@@ -18,7 +18,7 @@ class DuoFernMessage
 
     // GetAllDevicesStatus
     const DUOFERN_MSG_GET_ALL_DEVICES_STATUS = "0DFF0F400000000000000000000000000000FFFFFF01";
-    
+
     /**
      * Generates init serial msg
      *
@@ -68,8 +68,10 @@ class DuoFernMessage
      * Generates the expected response of a msg
      *
      * @param $msg
+     *              message in hex string in format /^[0-9A-F]{44}$/
      * @param $duoFernCode
-     * @return bool|string
+     *              fern codes in format /^[0-9A-F]{6}$/
+     * @return bool|string generated response message
      */
     public static function GenerateResponse($msg, $duoFernCode)
     {
