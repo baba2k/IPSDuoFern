@@ -269,7 +269,6 @@ trait PrivateFunction
         foreach (array_diff($oldChildrenIds, $childrenIds) as $oldChildId) {
             // unregister messages
             if ($oldChildId > 0) {
-                IPS_LogMessage("DuoFernGateway", "UpdateChildrenData() -> Unregistered child: " . $oldChildId);
                 $this->UnregisterMessage($oldChildId, IM_CHANGESETTINGS);
                 $this->UnregisterMessage($oldChildId, FM_DISCONNECT);
             }
@@ -279,7 +278,6 @@ trait PrivateFunction
         foreach (array_diff($childrenIds, $oldChildrenIds) as $childId) {
             // register messages
             if ($childId > 0) {
-                IPS_LogMessage("DuoFernGateway", "UpdateChildrenData() -> Registered child: " . $childId);
                 $this->RegisterMessage($childId, IM_CHANGESETTINGS);
                 $this->RegisterMessage($childId, FM_DISCONNECT);
             }
@@ -295,15 +293,12 @@ trait PrivateFunction
      */
     private function ForceRefresh()
     {
-        IPS_LogMessage("DuoFernGateway", "ForceRefresh()");
-
         // update children data and register/unregister msgs
         $this->UpdateChildrenData();
 
         // update parent data and register/unregister msgs
         if ($this->UpdateParentData() != 0 && $this->IsInstanceActive() && $this->IsParentInstanceActive()) {
             // initiates the duo fern connection
-            IPS_LogMessage("DuoFernGateway", "Init()");
             $this->Init();
         }
     }

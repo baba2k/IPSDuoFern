@@ -149,7 +149,7 @@ class DuoFernDevice extends IPSModule
     }
 
     /**
-     * Sends a UpdateChildrenData request to gateway
+     * Sends a update children data request to gateway
      * @return string|bool
      */
     private function SendUpdateChildrenData()
@@ -158,8 +158,6 @@ class DuoFernDevice extends IPSModule
             "DataID" => "{D608631B-BABA-4D08-ADB0-5364DD6A2526}",
             "UpdateChildrenData" => utf8_encode("true")
         )));
-
-        IPS_LogMessage("DuoFernDevice", "SendUpdateChildrenData()");
 
         return $result;
     }
@@ -175,7 +173,6 @@ class DuoFernDevice extends IPSModule
      */
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
     {
-        IPS_LogMessage("DuoFernDevice", "MessageSink() -> Message from SenderID " . $SenderID . " with Message " . $Message);
         switch ($Message) {
             case IPS_KERNELSTARTED :
                 $this->ApplyChanges();

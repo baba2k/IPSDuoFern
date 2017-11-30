@@ -172,9 +172,8 @@ class DuoFernGateway extends IPSModule
         // decode data
         $data = json_decode($JSONString);
 
-        // catch UpdateChildrenData from children
+        // catch update children data request from child
         if (isset ($data->UpdateChildrenData) && $data->UpdateChildrenData == "true") {
-            IPS_LogMessage("DuoFernGateway", "Got UpdateChildrenData from a child");
             $this->UpdateChildrenData();
             return "UpdateChildrenData";
         }
@@ -239,7 +238,6 @@ class DuoFernGateway extends IPSModule
      */
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
     {
-        IPS_LogMessage("DuoFernGateway", "MessageSink() -> Message from SenderID " . $SenderID . " with Message " . $Message);
         switch ($Message) {
             case IPS_KERNELSTARTED :
                 $this->ApplyChanges();
