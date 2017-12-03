@@ -67,9 +67,9 @@ trait LibraryFunction
         // send to parent io
         $result = $this->SendDataToParent($data);
 
-        if ($result != false) {
+        if ($result !== false) {
             $this->SendDebug("RECEIVED RESPONSE", $this->ConvertMsgToSend($result), 1);
-        } else {
+        } else { // never entered because of trigger_error in SendDataToParent
             $this->SendDebug("TIMEOUT WAITFORRESPONSE", $this->ConvertMsgToSend($this->ExpectedResponse($msg)), 1);
         }
 

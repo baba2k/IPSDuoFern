@@ -122,7 +122,7 @@ class DuoFernDevice extends IPSModule
         )));
 
         // trigger error when msg not sent
-        if ($result === false) {
+        if ($result == false) {
             $this->SendDebug("FAILED TRANSMIT", $Data, 1);
             // set status to device not available
             $this->SetStatus(self::IS_DEVICE_NOT_AVAILABLE);

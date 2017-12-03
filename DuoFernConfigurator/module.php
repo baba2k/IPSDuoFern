@@ -91,7 +91,7 @@ class DuoFernConfigurator extends IPSModule
         )));
 
         // trigger error when msg not sent
-        if ($result === false) {
+        if ($result == false) {
             $this->SendDebug("FAILED TRANSMIT", $Data, 1);
             trigger_error($this->Translate("Message could not be sent") . PHP_EOL, E_USER_ERROR);
             return false;
