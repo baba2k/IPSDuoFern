@@ -77,13 +77,6 @@ class DuoFernConfigurator extends IPSModule
      */
     protected function SendDataToParent($Data)
     {
-        // discard if no active gateway or io
-        if (!$this->IsParentInstanceActive() || !$this->IsGrandParentInstanceActive()) {
-            $this->SendDebug("DISCARD TRANSMIT", $Data, 1);
-            trigger_error($this->Translate("Message could not be sent") . PHP_EOL, E_USER_ERROR);
-            return false;
-        }
-
         // send to parent io
         $result = parent::SendDataToParent(json_encode(Array(
             "DataID" => "{D608631B-BABA-4D08-ADB0-5364DD6A2526}",

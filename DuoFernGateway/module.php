@@ -196,7 +196,6 @@ class DuoFernGateway extends IPSModule
      */
     protected function SendDataToParent($Data)
     {
-
         // discard if instance inactive or no active parent
         if (!$this->IsInstanceActive() || !$this->IsParentInstanceActive()) {
             $this->SendDebug("DISCARD TRANSMIT", $Data, 1);

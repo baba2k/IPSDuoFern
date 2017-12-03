@@ -93,26 +93,6 @@ trait IPSHelpFunction
     }
 
     /**
-     * Checks if grand parent instance is active
-     *
-     * @return boolean true if yes, false if not
-     */
-    private function IsGrandParentInstanceActive()
-    {
-        $instance = IPS_GetInstance($this->InstanceID);
-        if ($instance ['ConnectionID'] > 0) {
-            $parent = IPS_GetInstance($instance ['ConnectionID']);
-            if ($parent ['ConnectionID'] > 0) {
-                $grandParent = IPS_GetInstance($parent ['ConnectionID']);
-                if ($grandParent ['InstanceStatus'] == IS_ACTIVE) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
      * Enters a semaphore
      *
      * @param string $name
