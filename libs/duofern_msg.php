@@ -19,6 +19,15 @@ class DuoFernMessage
     // GetAllDevicesStatus
     const DUOFERN_MSG_GET_ALL_DEVICES_STATUS = "0DFF0F400000000000000000000000000000FFFFFF01";
 
+    // GetDeviceStatus
+    const DUOFERN_MSG_GET_DEVICE_STATUS = "0DFF0F400000000000000000000000000000xxxxxx01";
+
+    // commands with yy = pair table number (or can be every hex number like 00)
+    const DUOFERN_MSG_ON = "0D010E0300000000000000000000yy000000xxxxxx00";
+    const DUOFERN_MSG_OFF = "0D010E0200000000000000000000yy000000xxxxxx00";
+    const DUOFERN_MSG_AUTO = "0D01080600FE0000000000000000yy000000xxxxxx00";
+    const DUOFERN_MSG_MANUAL = "0D01080600FD0000000000000000yy000000xxxxxx00";
+
     /**
      * Generates init serial msg
      *
