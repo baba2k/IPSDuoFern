@@ -18,7 +18,8 @@ class DuoFernGateway extends IPSModule
      * @var int
      */
     const IS_INVALID_DUOFERN_CODE = IS_EBASE + 1;
-    const IS_INIT_FAILED = IS_EBASE + 2;
+    const IS_INIT_PENDING = IS_EBASE + 2;
+    const IS_INIT_FAILED = IS_EBASE + 3;
 
     /**
      * Traits
@@ -141,10 +142,12 @@ class DuoFernGateway extends IPSModule
                 $this->SendDebug("RECEIVED", $msg, 1);
 
                 // forward to devices
-                $this->SendDataToChildren(json_encode(Array("DataID" => "{244143D3-BABA-44D4-8740-B997B8F09E50}", "Buffer" => utf8_encode($msg), "DuoFernCode" => substr($displayMsg, 30, 6))));
+                $this->SendDataToChildren(json_encode(Array("DataID" => "{244143D3-BABA-44D4-8740-B997B8F09E50}",
+                    "Buffer" => utf8_encode($msg), "DuoFernCode" => substr($displayMsg, 30, 6))));
 
                 // forward to configurator
-                $this->SendDataToChildren(json_encode(Array("DataID" => "{15FD9630-BABA-4BCB-90E4-7DE815ECB79D}", "Buffer" => utf8_encode($msg))));
+                $this->SendDataToChildren(json_encode(Array("DataID" => "{15FD9630-BABA-4BCB-90E4-7DE815ECB79D}",
+                    "Buffer" => utf8_encode($msg))));
             }
 
             // send ack
@@ -178,6 +181,12 @@ class DuoFernGateway extends IPSModule
             return "UpdateChildrenData";
         }
 
+        // discard when init is pending
+        if ($this->GetStatus() == self::IS_INIT_PENDING) {
+            $this->SendDebug("DISCARD TRANSMIT", $data, 1);
+            return false;
+        }
+
         // get msg
         $msg = $this->ConvertMsgToDisplay(utf8_decode($data->Buffer));
 
@@ -197,7 +206,7 @@ class DuoFernGateway extends IPSModule
     protected function SendDataToParent($Data)
     {
         // discard if instance inactive or no active parent
-        if (!$this->IsInstanceActive() || !$this->IsParentInstanceActive()) {
+        if ((!$this->IsInstanceActive() && $this->GetStatus() != self::IS_INIT_PENDING) || !$this->IsParentInstanceActive() ) {
             $this->SendDebug("DISCARD TRANSMIT", $Data, 1);
             trigger_error($this->Translate("Message could not be sent") . PHP_EOL, E_USER_ERROR);
             return false;
@@ -246,7 +255,7 @@ class DuoFernGateway extends IPSModule
                 $this->ForceRefresh();
                 break;
             case IM_CHANGESTATUS :
-                if (($SenderID == @IPS_GetInstance($this->InstanceID) ['ConnectionID']) and ($Data [0] == IS_ACTIVE)) {
+                if ($SenderID == @IPS_GetInstance($this->InstanceID) ['ConnectionID']) {
                     $this->ForceRefresh();
                 }
                 break;

@@ -15,6 +15,9 @@ trait PrivateFunction
      */
     private function Init($retry = 5)
     {
+        // set instance status to init pending
+        $this->SetStatus(self::IS_INIT_PENDING);
+
         // get gateway duo fern code
         $gatewayDuoFernCode = $this->ReadPropertyString('duoFernCode');
 
@@ -53,13 +56,25 @@ trait PrivateFunction
             }
 
             // init pair table
+            $initFailedAtPairTable = false;
             foreach ($deviceDuoFernCodes as $number => $deviceDuoFernCode) {
                 $msg = DuoFernMessage::MsgInitPairtable($number, $deviceDuoFernCode);
                 $response = $this->SendMsg($msg);
+
+                // init failed at pair table
                 if ($response !== $this->ExpectedResponse($msg)) {
-                    $this->SendDebug("INIT FAIL", $this->ConvertMsgToSend($response), 1);
-                    continue;
+                    $initFailedAtPairTable = true;
+                    break;
                 }
+
+                // forward to devices
+                $this->SendPairTableNumber(utf8_encode($number), $deviceDuoFernCode);
+            }
+
+            // init failed at pair table
+            if ($initFailedAtPairTable === true) {
+                $this->SendDebug("INIT FAIL", $this->ConvertMsgToSend($response), 1);
+                continue;
             }
 
             // init end
@@ -69,6 +84,8 @@ trait PrivateFunction
                 continue;
             }
 
+            // wait 5 ms and send init success debug msg
+            IPS_Sleep(5);
             $this->SendDebug("INIT SUCCESS", $this->ConvertMsgToSend("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"), 1);
 
             // set instance status to active
@@ -77,10 +94,43 @@ trait PrivateFunction
             return true;
         }
 
+        // reset pair table numbers at devices
+        $this->ResetPairTableNumbersOnDevices($deviceDuoFernCodes);
+
         // set instance status to initialization failed
         $this->SetStatus(self::IS_INIT_FAILED);
 
         return false;
+    }
+
+    /**
+     * Sends a pair table number to device
+     * @param $number
+     * @param $deviceDuoFernCode
+     * @return string|bool
+     */
+    private function SendPairTableNumber($number, $deviceDuoFernCode)
+    {
+        $result = parent::SendDataToChildren(json_encode(Array(
+            "DataID" => "{244143D3-BABA-44D4-8740-B997B8F09E50}",
+            "DuoFernCode" => $deviceDuoFernCode,
+            "PairTableNumber" => utf8_encode($number)
+        )));
+
+        return $result;
+    }
+
+    /**
+     * Resets pair table numbers at devices
+     * @param $deviceDuoFernCodes
+     */
+    private function ResetPairTableNumbersOnDevices($deviceDuoFernCodes)
+    {
+        foreach ($deviceDuoFernCodes as $deviceDuoFernCode) {
+            $this->SendPairTableNumber("FF", $deviceDuoFernCode);
+        }
+
+        return;
     }
 
     /**
@@ -97,30 +147,37 @@ trait PrivateFunction
             return false;
         }
 
-        // ACK has no answer
-        if (strcmp($msg, DuoFernMessage::DUOFERN_MSG_ACK) === 0) {
-            // convert data from hex to string
-            $data = $this->ConvertMsgToSend($msg);
-
-            // send to parent io
-            $result = $this->SendDataToParent($data);
-
-            return ($result === false ? false : NULL);
-        }
-
         // convert data from hex to string
         $data = $this->ConvertMsgToSend($msg);
+
+        // return false if msg semaphore could not be set
+        if (!IPS_SemaphoreEnter('DUOFERN_SendMsg', 10000)) {
+            $this->SendDebug("FAILED TRANSMIT", $data, 1);
+            return false;
+        }
 
         // send to parent io
         $result = $this->SendDataToParent($data);
 
         // msg not sent
         if ($result === false) {
+            // leave msg semaphore
+            IPS_SemaphoreLeave('DUOFERN_SendMsg');
             return false;
+        }
+
+        // ACK has no answer
+        if (strcmp($msg, DuoFernMessage::DUOFERN_MSG_ACK) === 0) {
+            // leave msg semaphore
+            IPS_SemaphoreLeave('DUOFERN_SendMsg');
+            return NULL;
         }
 
         // wait for response
         $response = $this->WaitForResponseOf($msg);
+
+        // leave msg semaphore
+        IPS_SemaphoreLeave('DUOFERN_SendMsg');
 
         return $response;
     }
@@ -300,6 +357,8 @@ trait PrivateFunction
         if ($this->UpdateParentData() != 0 && $this->IsInstanceActive() && $this->IsParentInstanceActive()) {
             // initiates the duo fern connection
             $this->Init();
+        } else {
+            $this->ResetPairTableNumbersOnDevices($this->GetDeviceDuoFernCodes());
         }
     }
 

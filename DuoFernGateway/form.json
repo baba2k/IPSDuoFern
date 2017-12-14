@@ -54,6 +54,11 @@
     },
     {
       "code": 202,
+      "icon": "inactive",
+      "caption": "Initialization pending"
+    },
+    {
+      "code": 203,
       "icon": "error",
       "caption": "Initialization failed"
     }

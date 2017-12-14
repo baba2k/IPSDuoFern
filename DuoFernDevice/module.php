@@ -37,6 +37,9 @@ class DuoFernDevice extends IPSModule
 
         // register properties
         $this->RegisterPropertyString("duoFernCode", "XXXXXX");
+
+        // create buffers
+        $this->PairTableNumberBuffer = "FF";
     }
 
     /**
@@ -84,6 +87,12 @@ class DuoFernDevice extends IPSModule
     {
         // decode data
         $data = json_decode($JSONString);
+
+        // catch pair table number request from gateway
+        if (isset ($data->PairTableNumber)) {
+            $this->PairTableNumberBuffer = utf8_decode($data->PairTableNumber);
+            return;
+        }
 
         // get msg
         $msg = utf8_decode($data->Buffer);
@@ -141,20 +150,6 @@ class DuoFernDevice extends IPSModule
 
         // set status active
         $this->SetStatus(IS_ACTIVE);
-
-        return $result;
-    }
-
-    /**
-     * Sends a update children data request to gateway
-     * @return string|bool
-     */
-    private function SendUpdateChildrenData()
-    {
-        $result = parent::SendDataToParent(json_encode(Array(
-            "DataID" => "{D608631B-BABA-4D08-ADB0-5364DD6A2526}",
-            "UpdateChildrenData" => utf8_encode("true")
-        )));
 
         return $result;
     }

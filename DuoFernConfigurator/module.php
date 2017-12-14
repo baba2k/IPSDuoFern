@@ -77,7 +77,7 @@ class DuoFernConfigurator extends IPSModule
      */
     protected function SendDataToParent($Data)
     {
-        // send to parent io
+        // send to parent splitter
         $result = parent::SendDataToParent(json_encode(Array(
             "DataID" => "{D608631B-BABA-4D08-ADB0-5364DD6A2526}",
             "Buffer" => utf8_encode($Data)
