@@ -144,6 +144,8 @@ trait PrivateFunction
     {
         // check valid msg
         if (!preg_match(DuoFernRegex::DUOFERN_REGEX_MSG, $msg)) {
+            $this->SendDebug("DISCARD TRANSMIT", $this->ConvertMsgToSend($msg), 1);
+            trigger_error($this->Translate("Message could not be sent") . PHP_EOL, E_USER_ERROR);
             return false;
         }
 

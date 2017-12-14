@@ -23,6 +23,7 @@ class DuoFernMessage
     const DUOFERN_MSG_GET_DEVICE_STATUS = "0DFF0F400000000000000000000000000000xxxxxx01";
 
     // commands with yy = pair table number (or can be every hex number like 00)
+    const DUOFERN_MSG_PING = "0D01071600000000000000000000yy000000xxxxxx00";
     const DUOFERN_MSG_ON = "0D010E0300000000000000000000yy000000xxxxxx00";
     const DUOFERN_MSG_OFF = "0D010E0200000000000000000000yy000000xxxxxx00";
     const DUOFERN_MSG_AUTO = "0D01080600FE0000000000000000yy000000xxxxxx00";
@@ -85,7 +86,8 @@ class DuoFernMessage
     public static function GenerateResponse($msg, $duoFernCode)
     {
         // check valid msg
-        if (!preg_match(DuoFernRegex::DUOFERN_REGEX_MSG, $msg) || !preg_match(DuoFernRegex::DUOFERN_REGEX_DUOFERN_CODE, $duoFernCode)) {
+        if (!preg_match(DuoFernRegex::DUOFERN_REGEX_MSG, $msg)
+            || !preg_match(DuoFernRegex::DUOFERN_REGEX_DUOFERN_CODE, $duoFernCode)) {
             return false;
         }
 
@@ -93,7 +95,7 @@ class DuoFernMessage
             case self::MsgInitSerial($duoFernCode) :
                 $generatedResponse = "81" . substr($msg, 2, 6) . "0100" . substr($msg, 12);
                 break;
-            case DuoFernMessage::DUOFERN_MSG_GET_ALL_DEVICES_STATUS :
+            case DuoFernMessage::DUOFERN_MSG_GET_ALL_DEVICES_STATUS || DuoFernMessage::DUOFERN_MSG_GET_DEVICE_STATUS:
                 $generatedResponse = "81000000" . substr($msg, 8);
                 break;
             default :
