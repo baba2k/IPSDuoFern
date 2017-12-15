@@ -15,7 +15,13 @@
       "Instance already exists": "Instanz ist bereits vorhanden",
       "Instance could not be created": "Instanz konnte nicht erstellt werden",
       "Instance created": "Instanz erstellt",
-      "Message could not be sent": "Nachricht konnte nicht gesendet werden"
+      "Message could not be sent": "Nachricht konnte nicht gesendet werden",
+      "Remote Pairing (Only within the first 2 hours after power connection)": "Fernanmelden (Nur innerhalb der ersten 2 Std. nach Netzanschluss)",
+      "Enter DuoFern Code or select device from list above" : "DuoFern Code eingeben oder ein Gerät in der Liste auswählen",
+      "No DuoFern Code entered and no device selected": "Kein DuoFern Code eingegeben und kein Gerät in der Liste ausgewählt",
+      "Invalid DuoFern code (Format: XXXXXX with X = 0-9, A-F)": "DuoFern Code ist ungültig (Format: XXXXXX mit X = 0-9, A-F)",
+      "Start remote pair with device": "Starte Fernanmeldung mit Gerät",
+      "Remote Pairing": "Fernanmelden"
     }
   }
 }

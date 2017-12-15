@@ -42,8 +42,9 @@ trait PrivateFunction
             }
 
             // init serial
-            $response = $this->SendMsg(DuoFernMessage::MsgInitSerial($gatewayDuoFernCode));
-            if ($response !== $this->ExpectedResponse(DuoFernMessage::MsgInitSerial($gatewayDuoFernCode))) {
+            $msg = DuoFernMessage::GenerateMessage(DuoFernMessage::DUOFERN_MSG_INIT_SERIAL, $gatewayDuoFernCode);
+            $response = $this->SendMsg($msg);
+            if ($response !== $this->ExpectedResponse($msg)) {
                 $this->SendDebug("INIT FAIL", $this->ConvertMsgToSend($response), 1);
                 continue;
             }
@@ -58,7 +59,7 @@ trait PrivateFunction
             // init pair table
             $initFailedAtPairTable = false;
             foreach ($deviceDuoFernCodes as $number => $deviceDuoFernCode) {
-                $msg = DuoFernMessage::MsgInitPairtable($number, $deviceDuoFernCode);
+                $msg = DuoFernMessage::GenerateMessage(DuoFernMessage::DUOFERN_MSG_INIT_PAIRTABLE, $deviceDuoFernCode, $number);
                 $response = $this->SendMsg($msg);
 
                 // init failed at pair table

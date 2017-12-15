@@ -47,12 +47,34 @@
     },
     {
       "type": "Button",
-      "label": "Search devices",
+      "label": "Create instance",
       "onClick": ""
     },
     {
       "type": "Button",
-      "label": "Create instance",
+      "label": "Search devices",
+      "onClick": ""
+    },
+    {
+      "type": "Label",
+      "label": "\n"
+    },
+    {
+      "type": "Label",
+      "label": "Remote Pairing (Only within the first 2 hours after power connection)"
+    },
+    {
+      "type": "Label",
+      "label": "Enter DuoFern Code or select device from list above"
+    },
+    {
+      "type": "ValidationTextBox",
+      "name": "remotePairDuoFernCode",
+      "caption": "DuoFern Code"
+    },
+    {
+      "type": "Button",
+      "label": "Remote Pairing",
       "onClick": ""
     }
   ]

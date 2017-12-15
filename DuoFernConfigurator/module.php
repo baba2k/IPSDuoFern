@@ -174,40 +174,8 @@ class DuoFernConfigurator extends IPSModule
         // add items to list
         $data['actions'][2]['values'] = array_values($deviceList);
 
-        // define onClick method for search devices button
-        $data['actions'][3]['onClick'] = <<< 'EOT'
-                // include library
-                require_once(IPS_GetKernelDir() . DIRECTORY_SEPARATOR . "modules"
-                                                . DIRECTORY_SEPARATOR . "IPSDuoFern"
-                                                . DIRECTORY_SEPARATOR . "libs"
-                                                . DIRECTORY_SEPARATOR . "library.php");
-
-                // define helper function to translate
-                function Translate($string)
-                {
-                    $translations = json_decode(file_get_contents(IPS_GetKernelDir()
-                        . DIRECTORY_SEPARATOR . "modules"
-                        . DIRECTORY_SEPARATOR . "IPSDuoFern"
-                        . DIRECTORY_SEPARATOR . "DuoFernConfigurator"
-                        . DIRECTORY_SEPARATOR . "locale.json"), true);
-                    $translations = $translations["translations"]["de"];
-
-                    // found translation
-                    if (array_key_exists($string, $translations)) {
-                        return $translations[$string];
-                    }
-
-                    // do not translate
-                    return $string;
-                }
-                
-                DUOFERN_SendRawMsg($id, DuoFernMessage::DUOFERN_MSG_GET_ALL_DEVICES_STATUS);
-                echo Translate("Search for devices...");
-EOT;
-
-
         // define onClick method for create instance button
-        $data['actions'][4]['onClick'] = <<< 'EOT'
+        $data['actions'][3]['onClick'] = <<< 'EOT'
                 // define helper function to translate
                 function Translate($string)
                 {
@@ -263,6 +231,90 @@ EOT;
                 IPS_SetName($instanceId, $instanceName);
 
                 echo Translate("Instance created") . ": " .  $instanceName;
+EOT;
+
+        // define onClick method for search devices button
+        $data['actions'][4]['onClick'] = <<< 'EOT'
+                // include library
+                require_once(IPS_GetKernelDir() . DIRECTORY_SEPARATOR . "modules"
+                                                . DIRECTORY_SEPARATOR . "IPSDuoFern"
+                                                . DIRECTORY_SEPARATOR . "libs"
+                                                . DIRECTORY_SEPARATOR . "library.php");
+
+                // define helper function to translate
+                function Translate($string)
+                {
+                    $translations = json_decode(file_get_contents(IPS_GetKernelDir()
+                        . DIRECTORY_SEPARATOR . "modules"
+                        . DIRECTORY_SEPARATOR . "IPSDuoFern"
+                        . DIRECTORY_SEPARATOR . "DuoFernConfigurator"
+                        . DIRECTORY_SEPARATOR . "locale.json"), true);
+                    $translations = $translations["translations"]["de"];
+
+                    // found translation
+                    if (array_key_exists($string, $translations)) {
+                        return $translations[$string];
+                    }
+
+                    // do not translate
+                    return $string;
+                }
+                
+                DUOFERN_SendRawMsg($id, DuoFernMessage::DUOFERN_MSG_GET_ALL_DEVICES_STATUS);
+                echo Translate("Search for devices...");
+EOT;
+
+        // define onClick method for remote Pairing
+        $data['actions'][9]['onClick'] = <<< 'EOT'
+                // include library
+                require_once(IPS_GetKernelDir() . DIRECTORY_SEPARATOR . "modules"
+                                                . DIRECTORY_SEPARATOR . "IPSDuoFern"
+                                                . DIRECTORY_SEPARATOR . "libs"
+                                                . DIRECTORY_SEPARATOR . "library.php");
+
+                // define helper function to translate
+                function Translate($string)
+                {
+                    $translations = json_decode(file_get_contents(IPS_GetKernelDir()
+                        . DIRECTORY_SEPARATOR . "modules"
+                        . DIRECTORY_SEPARATOR . "IPSDuoFern"
+                        . DIRECTORY_SEPARATOR . "DuoFernConfigurator"
+                        . DIRECTORY_SEPARATOR . "locale.json"), true);
+                    $translations = $translations["translations"]["de"];
+
+                    // found translation
+                    if (array_key_exists($string, $translations)) {
+                        return $translations[$string];
+                    }
+
+                    // do not translate
+                    return $string;
+                }
+                
+                // enter duo fern code or select device from list
+                if ($deviceList == null && $remotePairDuoFernCode == null) {
+                    echo Translate("No DuoFern Code entered and no device selected");
+                    return;
+                }
+                
+                if ($remotePairDuoFernCode != null) { // duo fern code entered
+                    // check valid duo fern code
+                    if (!preg_match(DuoFernRegex::DUOFERN_REGEX_DUOFERN_CODE, $remotePairDuoFernCode)) {
+                        echo Translate("Invalid DuoFern code (Format: XXXXXX with X = 0-9, A-F)");
+                        return;
+                    }
+                    $duoFernCode = str_replace(' ', '', $remotePairDuoFernCode);
+                   
+                } else if ($deviceList != null) { // device selected from list
+                    $duoFernCode = str_replace(' ', '', $deviceList['duoFernCode']);
+                }
+                
+                //  replace duo fern code
+                if ($duoFernCode !== false) {
+                    $msg = preg_replace("/xxxxxx/", $duoFernCode, DuoFernMessage::DUOFERN_MSG_REMOTE_PAIR);
+                    DUOFERN_SendRawMsg($id, $msg);
+                    echo Translate("Start remote pair with device" . " " . trim(chunk_split($duoFernCode, 2, " ")));
+                }
 EOT;
 
         return json_encode($data);

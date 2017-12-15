@@ -16,11 +16,21 @@ class DuoFernMessage
     const DUOFERN_MSG_INIT_PAIRTABLE = "03yyxxxxxx0000000000000000000000000000000000";
     const DUOFERN_MSG_INIT_END = "10010000000000000000000000000000000000000000";
 
-    // GetAllDevicesStatus
+    // Device status
     const DUOFERN_MSG_GET_ALL_DEVICES_STATUS = "0DFF0F400000000000000000000000000000FFFFFF01";
-
-    // GetDeviceStatus
     const DUOFERN_MSG_GET_DEVICE_STATUS = "0DFF0F400000000000000000000000000000xxxxxx01";
+
+    // Pairing
+    const DUOFERN_MSG_PAIR_START = "04000000000000000000000000000000000000000000";
+    const DUOFERN_MSG_PAIR_STOP = "05000000000000000000000000000000000000000000";
+    const DUOFERN_MSG_UNPAIR_START = "07000000000000000000000000000000000000000000";
+    const DUOFERN_MSG_UNPAIR_STOP = "08000000000000000000000000000000000000000000";
+    const DUOFERN_MSG_REMOTE_PAIR = "0D0006010000000000000000000000000000xxxxxx01";
+    const DUOFERN_MSG_REMOTE_PAIR_START = "0D01060100000000000000000000yy000000xxxxxx00";
+    const DUOFERN_MSG_REMOTE_UNPAIR_START = "0D01060200000000000000000000yy000000xxxxxx00";
+    const DUOFERN_MSG_REMOTE_PAIR_UNPAIR_STOP = "0D01060300000000000000000000yy000000xxxxxx00";
+    const DUOFERN_MSG_PAIRED = "0602010000000000000000000000yyxxxxxx00000000";
+    const DUOFERN_MSG_UNPAIRED = "0603010000000000000000000000yyxxxxxx00000000";
 
     // commands with yy = pair table number (or can be every hex number like 00)
     const DUOFERN_MSG_PING = "0D01071600000000000000000000yy000000xxxxxx00";
@@ -30,46 +40,41 @@ class DuoFernMessage
     const DUOFERN_MSG_MANUAL = "0D01080600FD0000000000000000yy000000xxxxxx00";
 
     /**
-     * Generates init serial msg
-     *
-     * @param string $duoFernCode
-     *            duo fern code in format /^6F[0-9A-F]{4}$/
-     * @return string|boolean init serial msg or false if invalid duo fern code
-     */
-    public static function MsgInitSerial($duoFernCode)
-    {
-        // check valid msg
-        if (!preg_match(DuoFernRegex::DUOFERN_REGEX_GATEWAY_DUOFERN_CODE, $duoFernCode)) {
-            return false;
-        }
-
-        return preg_replace("/xxxxxx/", $duoFernCode, DuoFernMessage::DUOFERN_MSG_INIT_SERIAL);
-    }
-
-    /**
-     * Generates init pair table msg
-     *
-     * @param string $number
-     *            number of device in format /^[0-9A-F]{2}$/
-     * @param string $duoFernCode
+     * Generates a msg
+     * @param string $msg
+     *            message in format /^[0-9A-F]{44}$/
+     * @param string|bool $duoFernCode
      *            duo fern code in format /^[0-9A-F]{6}$/
-     * @return boolean init pairtable msg or false if invalid duo fern code or number
+     * @param string|bool $number
+     *            number of device in format /^[0-9A-F]{2}$/
+     * @return bool|string
      */
-    public static function MsgInitPairtable($number, $duoFernCode)
+    public static function GenerateMessage($msg, $duoFernCode = false, $number = false)
     {
         // check valid pairtable number
-        if (!preg_match(DuoFernRegex::DUOFERN_REGEX_PAIRTABLE_NUMBER, $number)) {
+        if ($number !== false && !preg_match(DuoFernRegex::DUOFERN_REGEX_PAIRTABLE_NUMBER, $number)) {
             return false;
+        }
+
+        // check valid duo fern code
+        if ($duoFernCode !== false && !preg_match(DuoFernRegex::DUOFERN_REGEX_DUOFERN_CODE, $duoFernCode)) {
+            return false;
+        }
+
+        //  replace duo fern code
+        if ($duoFernCode !== false) {
+            $msg = preg_replace("/xxxxxx/", $duoFernCode, $msg);
+        }
+
+        // replace pair table number
+        if ($number !== false) {
+            $msg = preg_replace("/yy/", $number, $msg);
         }
 
         // check valid msg
-        if (!preg_match(DuoFernRegex::DUOFERN_REGEX_DUOFERN_CODE, $duoFernCode)) {
+        if (!preg_match(DuoFernRegex::DUOFERN_REGEX_MSG, $msg)) {
             return false;
         }
-
-        // replace number and duo fern code
-        $msg = preg_replace("/yy/", $number, DuoFernMessage::DUOFERN_MSG_INIT_PAIRTABLE);
-        $msg = preg_replace("/xxxxxx/", $duoFernCode, $msg);
 
         return $msg;
     }
@@ -92,10 +97,12 @@ class DuoFernMessage
         }
 
         switch ($msg) {
-            case self::MsgInitSerial($duoFernCode) :
+            // init serial
+            case DuoFernMessage::GenerateMessage(DuoFernMessage::DUOFERN_MSG_INIT_SERIAL, $duoFernCode):
                 $generatedResponse = "81" . substr($msg, 2, 6) . "0100" . substr($msg, 12);
                 break;
-            case DuoFernMessage::DUOFERN_MSG_GET_ALL_DEVICES_STATUS || DuoFernMessage::DUOFERN_MSG_GET_DEVICE_STATUS:
+            // device status
+            case preg_match('/' . substr(DuoFernMessage::DUOFERN_MSG_GET_DEVICE_STATUS, 0, 7) . '.{36}/', $msg) ? $msg : !$msg:
                 $generatedResponse = "81000000" . substr($msg, 8);
                 break;
             default :
