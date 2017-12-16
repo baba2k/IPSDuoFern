@@ -89,6 +89,19 @@ trait PrivateFunction
             IPS_Sleep(5);
             $this->SendDebug("INIT SUCCESS", $this->ConvertMsgToSend("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"), 1);
 
+            // get status of all devices n times
+            $n = 1;
+            for ($i = 0; $i < $n; $i++) {
+                $this->SendMsg(DuoFernMessage::DUOFERN_MSG_GET_ALL_DEVICES_STATUS);
+            }
+
+            // get device status of each device
+            /*
+            foreach ($deviceDuoFernCodes as $number => $deviceDuoFernCode) {
+                $this->SendMsg(DuoFernMessage::GenerateMessage(DuoFernMessage::DUOFERN_MSG_GET_DEVICE_STATUS, $deviceDuoFernCode));
+            }
+            */
+
             // set instance status to active
             $this->SetStatus(IS_ACTIVE);
 
