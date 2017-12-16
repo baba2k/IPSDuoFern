@@ -16,12 +16,24 @@
       "Instance could not be created": "Instanz konnte nicht erstellt werden",
       "Instance created": "Instanz erstellt",
       "Message could not be sent": "Nachricht konnte nicht gesendet werden",
-      "Remote Pairing (Only within the first 2 hours after power connection)": "Fernanmelden (Nur innerhalb der ersten 2 Std. nach Netzanschluss)",
-      "Enter DuoFern Code or select device from list above" : "DuoFern Code eingeben oder ein Gerät in der Liste auswählen",
+      "Remote pairing (Only within the first 2 hours after power connection)": "Fernanmelden (Nur innerhalb der ersten 2 Std. nach Netzanschluss)",
+      "Enter DuoFern Code or select device from list above": "DuoFern Code eingeben oder ein Gerät in der Liste auswählen",
       "No DuoFern Code entered and no device selected": "Kein DuoFern Code eingegeben und kein Gerät in der Liste ausgewählt",
       "Invalid DuoFern code (Format: XXXXXX with X = 0-9, A-F)": "DuoFern Code ist ungültig (Format: XXXXXX mit X = 0-9, A-F)",
       "Start remote pair with device": "Starte Fernanmeldung mit Gerät",
-      "Remote Pairing": "Fernanmelden"
+      "Remote pairing": "Fernanmelden",
+      "Start pairing mode...": "Starte Anmeldemodus...",
+      "Stop pairing mode...": "Stoppe Anmeldemodus...",
+      "Start unpairing mode...": "Starte Abmeldemodus...",
+      "Stop unpairing mode...": "Stoppe Abmeldemodus...",
+      "See messages for more details": "Siehe Meldungen für weitere Details",
+      "Device %s paired": "Gerät %s angemeldet",
+      "Device %s unpaired": "Gerät %s abgemeldet",
+      "Device %s already unpaired": "Gerät %s ist bereits abgemeldet",
+      "Pairing- and unpairing mode": "An- und Abmeldemodus",
+      "Start pairing or unpairing mode for 60 seconds": "Startet den An- oder Abmeldemodus für 60 Sekunden",
+      "Pair devices": "Geräte anmelden",
+      "Unpair devices": "Geräte abmelden"
     }
   }
 }

@@ -19,6 +19,7 @@ class DuoFernMessage
     // Device status
     const DUOFERN_MSG_GET_ALL_DEVICES_STATUS = "0DFF0F400000000000000000000000000000FFFFFF01";
     const DUOFERN_MSG_GET_DEVICE_STATUS = "0DFF0F400000000000000000000000000000xxxxxx01";
+    const DUOFERN_MSG_STATUS = "0FFF0Fbbaaaaaaaaaaaaaaaaaaaayyzzzzzzxxxxxx01"; // bb = 23 and 22 device group
 
     // Pairing
     const DUOFERN_MSG_PAIR_START = "04000000000000000000000000000000000000000000";
@@ -31,6 +32,7 @@ class DuoFernMessage
     const DUOFERN_MSG_REMOTE_PAIR_UNPAIR_STOP = "0D01060300000000000000000000yy000000xxxxxx00";
     const DUOFERN_MSG_PAIRED = "0602010000000000000000000000yyxxxxxx00000000";
     const DUOFERN_MSG_UNPAIRED = "0603010000000000000000000000yyxxxxxx00000000";
+    const DUOFERN_MSG_ALREADY_UNPAIRED = "0605010000000000000000000000yyxxxxxx00000000";
 
     // commands with yy = pair table number (or can be every hex number like 00)
     const DUOFERN_MSG_PING = "0D01071600000000000000000000yy000000xxxxxx00";
@@ -102,7 +104,8 @@ class DuoFernMessage
                 $generatedResponse = "81" . substr($msg, 2, 6) . "0100" . substr($msg, 12);
                 break;
             // device status
-            case preg_match('/' . substr(DuoFernMessage::DUOFERN_MSG_GET_DEVICE_STATUS, 0, 7) . '.{36}/', $msg) ? $msg : !$msg:
+            case preg_match('/^' . substr(DuoFernMessage::DUOFERN_MSG_GET_DEVICE_STATUS, 0, 8) . '.{36}$/', $msg) ? $msg : !$msg:
+            case preg_match('/^' . substr(DuoFernMessage::DUOFERN_MSG_REMOTE_PAIR, 0, 8) . '.{36}$/', $msg) ? $msg : !$msg:
                 $generatedResponse = "81000000" . substr($msg, 8);
                 break;
             default :

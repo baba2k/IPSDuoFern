@@ -61,11 +61,26 @@ class DuoFernConfigurator extends IPSModule
         // send msg as debug msg
         $this->SendDebug("RECEIVED", $msg, 1);
 
+        $displayMsg = $this->ConvertMsgToDisplay($msg);
+
         // save seen devices with last message timestamp
         $seenDevicesBuffer = (array)$this->SeenDevicesBuffer; // get buffer
-        $duoFernCode = (string)substr($this->ConvertMsgToDisplay($msg), 30, 6);
+        $duoFernCode = (string)substr($displayMsg, 30, 6);
         $seenDevicesBuffer[$duoFernCode] = time();
         $this->SeenDevicesBuffer = $seenDevicesBuffer;
+
+        // send paired and unpaired log messages
+        $duoFernDeviceType = DuoFernDeviceType::getDeviceType(substr($duoFernCode, 0, 2));
+        if (preg_match('/^' . substr(DuoFernMessage::DUOFERN_MSG_PAIRED, 0, 6) . '.{38}$/', $displayMsg)) {
+            IPS_LogMessage(IPS_GetName($this->InstanceID), sprintf($this->Translate("Device %s paired"),
+                $duoFernDeviceType != false ? $duoFernDeviceType . " (" . trim(chunk_split($duoFernCode, 2, " ")) . ")" : trim(chunk_split($duoFernCode, 2, " "))));
+        } else if (preg_match('/^' . substr(DuoFernMessage::DUOFERN_MSG_UNPAIRED, 0, 6) . '.{38}$/', $displayMsg)) {
+            IPS_LogMessage(IPS_GetName($this->InstanceID), sprintf($this->Translate("Device %s unpaired"),
+                $duoFernDeviceType != false ? $duoFernDeviceType . " (" . trim(chunk_split($duoFernCode, 2, " ")) . ")" : trim(chunk_split($duoFernCode, 2, " "))));
+        } else if (preg_match('/^' . substr(DuoFernMessage::DUOFERN_MSG_ALREADY_UNPAIRED, 0, 6) . '.{38}$/', $displayMsg)) {
+            IPS_LogMessage(IPS_GetName($this->InstanceID), sprintf($this->Translate("Device %s already unpaired"),
+                $duoFernDeviceType != false ? $duoFernDeviceType . " (" . trim(chunk_split($duoFernCode, 2, " ")) . ")" : trim(chunk_split($duoFernCode, 2, " "))));
+        }
     }
 
     /**
@@ -311,10 +326,90 @@ EOT;
                 
                 //  replace duo fern code
                 if ($duoFernCode !== false) {
-                    $msg = preg_replace("/xxxxxx/", $duoFernCode, DuoFernMessage::DUOFERN_MSG_REMOTE_PAIR);
-                    DUOFERN_SendRawMsg($id, $msg);
-                    echo Translate("Start remote pair with device" . " " . trim(chunk_split($duoFernCode, 2, " ")));
+                    $duoFernDeviceType = DuoFernDeviceType::getDeviceType(substr($duoFernCode, 0, 2));
+                    IPS_LogMessage(IPS_GetName($id), Translate("Start pairing mode..."));
+                    DUOFERN_SendRawMsg($id, DuoFernMessage::DUOFERN_MSG_PAIR_START);
+                    IPS_LogMessage(IPS_GetName($id), Translate("Start remote pair with device") 
+                            . " " . ($duoFernDeviceType != false ? $duoFernDeviceType . " (" 
+                            . trim(chunk_split($duoFernCode, 2, " ")) . ")" : trim(chunk_split($duoFernCode, 2, " "))));
+                    echo Translate("Start remote pair with device") . " " 
+                            . ($duoFernDeviceType != false ? $duoFernDeviceType . " (" . trim(chunk_split($duoFernCode, 2, " ")) . ")" : 
+                            trim(chunk_split($duoFernCode, 2, " "))) . "\n" . Translate("See messages for more details");
+                    DUOFERN_SendRawMsg($id, preg_replace("/xxxxxx/", $duoFernCode, DuoFernMessage::DUOFERN_MSG_REMOTE_PAIR));
+                    IPS_Sleep(5000);
+                    DUOFERN_SendRawMsg($id, DuoFernMessage::DUOFERN_MSG_PAIR_STOP);
+                    IPS_LogMessage(IPS_GetName($id), Translate("Stop pairing mode..."));
                 }
+EOT;
+
+        // define onClick method for pairing mode
+        $data['actions'][13]['onClick'] = <<< 'EOT'
+                // include library
+                require_once(IPS_GetKernelDir() . DIRECTORY_SEPARATOR . "modules"
+                                                . DIRECTORY_SEPARATOR . "IPSDuoFern"
+                                                . DIRECTORY_SEPARATOR . "libs"
+                                                . DIRECTORY_SEPARATOR . "library.php");
+
+                // define helper function to translate
+                function Translate($string)
+                {
+                    $translations = json_decode(file_get_contents(IPS_GetKernelDir()
+                        . DIRECTORY_SEPARATOR . "modules"
+                        . DIRECTORY_SEPARATOR . "IPSDuoFern"
+                        . DIRECTORY_SEPARATOR . "DuoFernConfigurator"
+                        . DIRECTORY_SEPARATOR . "locale.json"), true);
+                    $translations = $translations["translations"]["de"];
+
+                    // found translation
+                    if (array_key_exists($string, $translations)) {
+                        return $translations[$string];
+                    }
+
+                    // do not translate
+                    return $string;
+                }
+    
+                echo Translate("Start pairing mode...") . "\n" . Translate("See messages for more details");
+                IPS_LogMessage(IPS_GetName($id), Translate("Start pairing mode..."));
+                DUOFERN_SendRawMsg($id, DuoFernMessage::DUOFERN_MSG_PAIR_START);
+                IPS_Sleep(10000);
+                DUOFERN_SendRawMsg($id, DuoFernMessage::DUOFERN_MSG_PAIR_STOP);
+                IPS_LogMessage(IPS_GetName($id), Translate("Stop pairing mode..."));
+EOT;
+
+        // define onClick method for unpairing mode
+        $data['actions'][14]['onClick'] = <<< 'EOT'
+                // include library
+                require_once(IPS_GetKernelDir() . DIRECTORY_SEPARATOR . "modules"
+                                                . DIRECTORY_SEPARATOR . "IPSDuoFern"
+                                                . DIRECTORY_SEPARATOR . "libs"
+                                                . DIRECTORY_SEPARATOR . "library.php");
+
+                // define helper function to translate
+                function Translate($string)
+                {
+                    $translations = json_decode(file_get_contents(IPS_GetKernelDir()
+                        . DIRECTORY_SEPARATOR . "modules"
+                        . DIRECTORY_SEPARATOR . "IPSDuoFern"
+                        . DIRECTORY_SEPARATOR . "DuoFernConfigurator"
+                        . DIRECTORY_SEPARATOR . "locale.json"), true);
+                    $translations = $translations["translations"]["de"];
+
+                    // found translation
+                    if (array_key_exists($string, $translations)) {
+                        return $translations[$string];
+                    }
+
+                    // do not translate
+                    return $string;
+                }
+    
+                echo Translate("Start unpairing mode...") . "\n" . Translate("See messages for more details");
+                IPS_LogMessage(IPS_GetName($id), Translate("Start unpairing mode..."));
+                DUOFERN_SendRawMsg($id, DuoFernMessage::DUOFERN_MSG_UNPAIR_START);
+                IPS_Sleep(10000);
+                DUOFERN_SendRawMsg($id, DuoFernMessage::DUOFERN_MSG_UNPAIR_STOP);
+                IPS_LogMessage(IPS_GetName($id), Translate("Stop unpairing mode..."));
 EOT;
 
         return json_encode($data);

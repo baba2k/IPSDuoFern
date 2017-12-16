@@ -61,7 +61,7 @@
     },
     {
       "type": "Label",
-      "label": "Remote Pairing (Only within the first 2 hours after power connection)"
+      "label": "Remote pairing (Only within the first 2 hours after power connection)"
     },
     {
       "type": "Label",
@@ -74,7 +74,29 @@
     },
     {
       "type": "Button",
-      "label": "Remote Pairing",
+      "label": "Remote pairing",
+      "onClick": ""
+    },
+    {
+      "type": "Label",
+      "label": "\n"
+    },
+    {
+      "type": "Label",
+      "label": "Pairing- and unpairing mode"
+    },
+    {
+      "type": "Label",
+      "label": "Start pairing or unpairing mode for 60 seconds"
+    },
+    {
+      "type": "Button",
+      "label": "Pair devices",
+      "onClick": ""
+    },
+    {
+      "type": "Button",
+      "label": "Unpair devices",
       "onClick": ""
     }
   ]
