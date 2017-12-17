@@ -29,6 +29,10 @@ class DuoFernConfigurator extends IPSModule
 
         // create buffers
         $this->SeenDevicesBuffer = array();
+
+        // create timers
+        $this->RegisterTimer("StopPairingMode", 0, 'DUOFERN_StopPairingMode($_IPS["TARGET"]);');
+        $this->RegisterTimer("StopUnpairingMode", 0, 'DUOFERN_StopUnpairingMode($_IPS["TARGET"]);');
     }
 
     /**
@@ -324,22 +328,15 @@ EOT;
                     $duoFernCode = str_replace(' ', '', $deviceList['duoFernCode']);
                 }
                 
-                //  replace duo fern code
-                if ($duoFernCode !== false) {
-                    $duoFernDeviceType = DuoFernDeviceType::getDeviceType(substr($duoFernCode, 0, 2));
-                    IPS_LogMessage(IPS_GetName($id), Translate("Start pairing mode..."));
-                    DUOFERN_SendRawMsg($id, DuoFernMessage::DUOFERN_MSG_PAIR_START);
-                    IPS_LogMessage(IPS_GetName($id), Translate("Start remote pair with device") 
-                            . " " . ($duoFernDeviceType != false ? $duoFernDeviceType . " (" 
-                            . trim(chunk_split($duoFernCode, 2, " ")) . ")" : trim(chunk_split($duoFernCode, 2, " "))));
-                    echo Translate("Start remote pair with device") . " " 
-                            . ($duoFernDeviceType != false ? $duoFernDeviceType . " (" . trim(chunk_split($duoFernCode, 2, " ")) . ")" : 
-                            trim(chunk_split($duoFernCode, 2, " "))) . "\n" . Translate("See messages for more details");
-                    DUOFERN_SendRawMsg($id, preg_replace("/xxxxxx/", $duoFernCode, DuoFernMessage::DUOFERN_MSG_REMOTE_PAIR));
-                    IPS_Sleep(5000);
-                    DUOFERN_SendRawMsg($id, DuoFernMessage::DUOFERN_MSG_PAIR_STOP);
-                    IPS_LogMessage(IPS_GetName($id), Translate("Stop pairing mode..."));
-                }
+                //  get device type name
+                $duoFernDeviceType = DuoFernDeviceType::getDeviceType(substr($duoFernCode, 0, 2));
+
+                echo Translate("Start remote pair with device") . " " 
+                        . ($duoFernDeviceType != false ? $duoFernDeviceType . " (" . trim(chunk_split($duoFernCode, 2, " ")) . ")" : 
+                        trim(chunk_split($duoFernCode, 2, " "))) . "\n" . Translate("See messages for more details");
+                        
+                // start remote pair
+                DUOFERN_RemotePairDevice($id, $duoFernCode);
 EOT;
 
         // define onClick method for pairing mode
@@ -370,11 +367,7 @@ EOT;
                 }
     
                 echo Translate("Start pairing mode...") . "\n" . Translate("See messages for more details");
-                IPS_LogMessage(IPS_GetName($id), Translate("Start pairing mode..."));
-                DUOFERN_SendRawMsg($id, DuoFernMessage::DUOFERN_MSG_PAIR_START);
-                IPS_Sleep(10000);
-                DUOFERN_SendRawMsg($id, DuoFernMessage::DUOFERN_MSG_PAIR_STOP);
-                IPS_LogMessage(IPS_GetName($id), Translate("Stop pairing mode..."));
+                DUOFERN_StartPairingMode($id, 60);
 EOT;
 
         // define onClick method for unpairing mode
@@ -405,11 +398,7 @@ EOT;
                 }
     
                 echo Translate("Start unpairing mode...") . "\n" . Translate("See messages for more details");
-                IPS_LogMessage(IPS_GetName($id), Translate("Start unpairing mode..."));
-                DUOFERN_SendRawMsg($id, DuoFernMessage::DUOFERN_MSG_UNPAIR_START);
-                IPS_Sleep(10000);
-                DUOFERN_SendRawMsg($id, DuoFernMessage::DUOFERN_MSG_UNPAIR_STOP);
-                IPS_LogMessage(IPS_GetName($id), Translate("Stop unpairing mode..."));
+                DUOFERN_StartUnpairingMode($id, 60);
 EOT;
 
         return json_encode($data);
