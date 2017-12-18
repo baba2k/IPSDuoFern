@@ -166,34 +166,21 @@ trait PrivateFunction
         // convert data from hex to string
         $data = $this->ConvertMsgToSend($msg);
 
-        // return false if msg semaphore could not be set
-        if (!IPS_SemaphoreEnter('DUOFERN_SendMsg', 10000)) {
-            $this->SendDebug("FAILED TRANSMIT", $data, 1);
-            return false;
-        }
-
         // send to parent io
         $result = $this->SendDataToParent($data);
 
         // msg not sent
         if ($result === false) {
-            // leave msg semaphore
-            IPS_SemaphoreLeave('DUOFERN_SendMsg');
             return false;
         }
 
         // ACK has no answer
         if (strcmp($msg, DuoFernMessage::DUOFERN_MSG_ACK) === 0) {
-            // leave msg semaphore
-            IPS_SemaphoreLeave('DUOFERN_SendMsg');
             return NULL;
         }
 
         // wait for response
         $response = $this->WaitForResponseOf($msg);
-
-        // leave msg semaphore
-        IPS_SemaphoreLeave('DUOFERN_SendMsg');
 
         return $response;
     }

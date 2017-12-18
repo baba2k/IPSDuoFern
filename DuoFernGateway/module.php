@@ -212,11 +212,19 @@ class DuoFernGateway extends IPSModule
             return false;
         }
 
+        if (!IPS_SemaphoreEnter('DUOFERN_SendMsg', 10000)) {
+            $this->SendDebug("FAILED TRANSMIT", $Data, 1);
+            return false;
+        }
+
         // send to parent io
         $result = parent::SendDataToParent(json_encode(Array(
             "DataID" => "{79827379-F36E-4ADA-8A95-5F8D1DC92FA9}",
             "Buffer" => utf8_encode($Data)
         )));
+
+        // leave msg semaphore
+        IPS_SemaphoreLeave('DUOFERN_SendMsg');
 
         // trigger error when msg not sent
         if ($result === false) {
