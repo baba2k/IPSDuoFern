@@ -208,12 +208,8 @@ class DuoFernGateway extends IPSModule
         // discard if instance inactive or no active parent
         if ((!$this->IsInstanceActive() && $this->GetStatus() != self::IS_INIT_PENDING) || !$this->IsParentInstanceActive() ) {
             $this->SendDebug("DISCARD TRANSMIT", $Data, 1);
+            IPS_SemaphoreLeave('DUOFERN_SendMsg');
             trigger_error($this->Translate("Message could not be sent") . PHP_EOL, E_USER_ERROR);
-            return false;
-        }
-
-        if (!IPS_SemaphoreEnter('DUOFERN_SendMsg', 10000)) {
-            $this->SendDebug("FAILED TRANSMIT", $Data, 1);
             return false;
         }
 
@@ -223,12 +219,10 @@ class DuoFernGateway extends IPSModule
             "Buffer" => utf8_encode($Data)
         )));
 
-        // leave msg semaphore
-        IPS_SemaphoreLeave('DUOFERN_SendMsg');
-
         // trigger error when msg not sent
         if ($result === false) {
             $this->SendDebug("FAILED TRANSMIT", $Data, 1);
+            IPS_SemaphoreLeave('DUOFERN_SendMsg');
             trigger_error($this->Translate("Message could not be sent") . PHP_EOL, E_USER_ERROR);
             return false;
         }
