@@ -19,14 +19,17 @@ trait PublicFunction
     }
 
     /**
-     *  Pairing device by duo fern code for 6s
+     *  Pairing device by duo fern code
      *
      * @param string $duoFernCode
      *            duo fern code in hex string in format /^[0-9A-F]{6}$/
-     * @return boolean true if started, false if not
+     * @return boolean true if paired, false if not
      */
     public function RemotePairDevice(string $duoFernCode)
     {
+        // wait for response time in seconds
+        $waitForResponseTime = 5;
+
         // check valid duo fern code
         if (!preg_match(DuoFernRegex::DUOFERN_REGEX_DUOFERN_CODE, $duoFernCode)) {
             echo $this->Translate("Invalid DuoFern code (Format: XXXXXX with X = 0-9, A-F)");
@@ -36,8 +39,8 @@ trait PublicFunction
         //  get device type name
         $duoFernDeviceType = DuoFernDeviceType::getDeviceType(substr($duoFernCode, 0, 2));
 
-        // start pairing mode for 5 seconds
-        $this->StartPairingMode(5);
+        // start pairing mode
+        $this->StartPairingMode($waitForResponseTime * 2);
 
         // start remote pair with device
         IPS_LogMessage(IPS_GetName($this->InstanceID), $this->Translate("Start remote pair with device")
@@ -45,7 +48,15 @@ trait PublicFunction
                 . trim(chunk_split($duoFernCode, 2, " ")) . ")" : trim(chunk_split($duoFernCode, 2, " "))));
         $this->SendRawMsg(preg_replace("/xxxxxx/", $duoFernCode, DuoFernMessage::DUOFERN_MSG_REMOTE_PAIR));
 
-        return true;
+        // wait for paired msg
+        $pairedMsg = preg_replace("/xxxxxx/", $duoFernCode, DuoFernMessage::DUOFERN_MSG_PAIRED);
+        $pairedMsg = preg_replace("/yy/", "..", $pairedMsg);
+        $response = $this->WaitForMsg($pairedMsg, $waitForResponseTime);
+
+        // stop pairing mode
+        $this->StopPairingMode();
+
+        return $response;
     }
 
     /**
@@ -143,7 +154,6 @@ trait PublicFunction
 
         return true;
     }
-
 
 }
 

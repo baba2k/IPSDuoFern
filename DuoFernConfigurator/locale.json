@@ -21,6 +21,8 @@
       "No DuoFern Code entered and no device selected": "Kein DuoFern Code eingegeben und kein Gerät in der Liste ausgewählt",
       "Invalid DuoFern code (Format: XXXXXX with X = 0-9, A-F)": "DuoFern Code ist ungültig (Format: XXXXXX mit X = 0-9, A-F)",
       "Start remote pair with device": "Starte Fernanmeldung mit Gerät",
+      "Device %s paired successful": "Gerät %s erfolgreich angemeldet",
+      "Device %s not paired": "Gerät %s konnte nicht angemeldet werden",
       "Remote pairing": "Fernanmelden",
       "Start pairing mode...": "Starte Anmeldemodus...",
       "Stop pairing mode...": "Stoppe Anmeldemodus...",

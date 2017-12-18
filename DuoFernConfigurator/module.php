@@ -29,6 +29,7 @@ class DuoFernConfigurator extends IPSModule
 
         // create buffers
         $this->SeenDevicesBuffer = array();
+        $this->WaitForMsgBuffer = new DuoFernWaitForMsgBuffer();
 
         // create timers
         $this->RegisterTimer("StopPairingMode", 0, 'DUOFERN_StopPairingMode($_IPS["TARGET"]);');
@@ -66,6 +67,11 @@ class DuoFernConfigurator extends IPSModule
         $this->SendDebug("RECEIVED", $msg, 1);
 
         $displayMsg = $this->ConvertMsgToDisplay($msg);
+
+        // wait for msg buffer
+        $waitForMsgBuffer = $this->WaitForMsgBuffer;
+        $waitForMsgBuffer->Received($displayMsg);
+        $this->WaitForMsgBuffer = $waitForMsgBuffer;
 
         // save seen devices with last message timestamp
         $seenDevicesBuffer = (array)$this->SeenDevicesBuffer; // get buffer
@@ -330,13 +336,19 @@ EOT;
                 
                 //  get device type name
                 $duoFernDeviceType = DuoFernDeviceType::getDeviceType(substr($duoFernCode, 0, 2));
-
-                echo Translate("Start remote pair with device") . " " 
-                        . ($duoFernDeviceType != false ? $duoFernDeviceType . " (" . trim(chunk_split($duoFernCode, 2, " ")) . ")" : 
-                        trim(chunk_split($duoFernCode, 2, " "))) . "\n" . Translate("See messages for more details");
                         
                 // start remote pair
-                DUOFERN_RemotePairDevice($id, $duoFernCode);
+                $result = DUOFERN_RemotePairDevice($id, $duoFernCode);
+                
+                if ($result !== false) {
+                    echo sprintf(Translate("Device %s paired successful"), ($duoFernDeviceType != false ? 
+                            $duoFernDeviceType . " (" . trim(chunk_split($duoFernCode, 2, " ")) . ")" :
+                            trim(chunk_split($duoFernCode, 2, " "))));
+                } else {
+                    echo sprintf(Translate("Device %s not paired"), ($duoFernDeviceType != false ? 
+                            $duoFernDeviceType . " (" . trim(chunk_split($duoFernCode, 2, " ")) . ")" :
+                            trim(chunk_split($duoFernCode, 2, " "))));
+                }    
 EOT;
 
         // define onClick method for pairing mode
