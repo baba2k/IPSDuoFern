@@ -285,7 +285,7 @@ EOT;
                     return $string;
                 }
                 
-                DUOFERN_SendRawMsg($id, DuoFernMessage::DUOFERN_MSG_GET_ALL_DEVICES_STATUS);
+                DUOFERN_GetAllDevicesStatus($id);
                 echo Translate("Search for devices...");
 EOT;
 
@@ -338,7 +338,7 @@ EOT;
                 $duoFernDeviceType = DuoFernDeviceType::getDeviceType(substr($duoFernCode, 0, 2));
                         
                 // start remote pair
-                $result = DUOFERN_RemotePairDevice($id, $duoFernCode);
+                $result = DUOFERN_DeviceRemotePair($id, $duoFernCode);
                 
                 if ($result !== false) {
                     echo sprintf(Translate("Device %s paired successful"), ($duoFernDeviceType != false ? 

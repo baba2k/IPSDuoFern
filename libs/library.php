@@ -96,6 +96,13 @@ trait LibraryFunction
         return $expectedResponse;
     }
 
+    /**
+     * Waits for an expected message $seconds seconds
+     *
+     * @param $expectedMsg
+     * @param int $seconds
+     * @return bool
+     */
     private function WaitForMsg($expectedMsg, $seconds = 10)
     {
         // try to get response $seconds times
@@ -141,7 +148,7 @@ class DuoFernWaitForMsgBuffer
     public $items = array();
 
     /**
-     * Wait For a msg. if not in items add msg else wait until msg is received
+     * Waits for a msg. if not in items add msg else wait until msg is received
      * @param $msg
      * @return bool
      */
@@ -162,7 +169,7 @@ class DuoFernWaitForMsgBuffer
     }
 
     /**
-     * Set msg as received when it is in items and received = false
+     * Sets a msg as received when in items and received = false
      * @param $msg
      * @return bool
      */
