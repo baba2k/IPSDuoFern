@@ -56,11 +56,10 @@ trait PublicFunction
         IPS_LogMessage(IPS_GetName($this->InstanceID), $this->Translate("Start remote pair with device")
             . " " . ($duoFernDeviceType != false ? $duoFernDeviceType . " ("
                 . trim(chunk_split($duoFernCode, 2, " ")) . ")" : trim(chunk_split($duoFernCode, 2, " "))));
-        $this->SendRawMsg(preg_replace("/xxxxxx/", $duoFernCode, DuoFernMessage::DUOFERN_MSG_REMOTE_PAIR));
+        $this->SendRawMsg(DuoFernMessage::GenerateMessage(DuoFernMessage::DUOFERN_MSG_REMOTE_PAIR, $duoFernCode));
 
         // wait for paired msg
-        $pairedMsg = preg_replace("/xxxxxx/", $duoFernCode, DuoFernMessage::DUOFERN_MSG_PAIRED);
-        $pairedMsg = preg_replace("/yy/", "..", $pairedMsg);
+        $pairedMsg = DuoFernMessage::GenerateMessage(DuoFernMessage::DUOFERN_MSG_PAIRED, $duoFernCode, "..");
         $response = $this->WaitForMsg($pairedMsg, $waitForResponseTime);
 
         // stop pairing mode

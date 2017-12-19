@@ -19,7 +19,13 @@ class DuoFernMessage
     // Device status
     const DUOFERN_MSG_GET_ALL_DEVICES_STATUS = "0DFF0F400000000000000000000000000000FFFFFF01";
     const DUOFERN_MSG_GET_DEVICE_STATUS = "0DFF0F400000000000000000000000000000xxxxxx01";
-    const DUOFERN_MSG_STATUS = "0FFF0Fbbaaaaaaaaaaaaaaaaaaaayyzzzzzzxxxxxx01"; // bb = 23 and 22 device group
+    const DUOFERN_MSG_STATUS = "0FFF0Fggdd00aaaaaaaaaaaavv00yyzzzzzzxxxxxx01";
+    // gg = 23 and 22 device group
+    // vv \ 10 = version e.g. vv = 25 => version 2.5
+    // dd = 09 or 0F?
+    // zzzzzz = sender duo fern code
+    // xxxxxx = receiver duo fern code
+    // commands with yy = pair table number (or can be every hex number like FF)
 
     // Pairing
     const DUOFERN_MSG_PAIR_START = "04000000000000000000000000000000000000000000";
@@ -34,7 +40,7 @@ class DuoFernMessage
     const DUOFERN_MSG_UNPAIRED = "0603010000000000000000000000yyxxxxxx00000000";
     const DUOFERN_MSG_ALREADY_UNPAIRED = "0605010000000000000000000000yyxxxxxx00000000";
 
-    // commands with yy = pair table number (or can be every hex number like 00)
+    // commands
     const DUOFERN_MSG_PING = "0D01071600000000000000000000yy000000xxxxxx00";
     const DUOFERN_MSG_ON = "0D010E0300000000000000000000yy000000xxxxxx00";
     const DUOFERN_MSG_OFF = "0D010E0200000000000000000000yy000000xxxxxx00";
@@ -53,11 +59,6 @@ class DuoFernMessage
      */
     public static function GenerateMessage($msg, $duoFernCode = false, $number = false)
     {
-        // check valid pairtable number
-        if ($number !== false && !preg_match(DuoFernRegex::DUOFERN_REGEX_PAIRTABLE_NUMBER, $number)) {
-            return false;
-        }
-
         // check valid duo fern code
         if ($duoFernCode !== false && !preg_match(DuoFernRegex::DUOFERN_REGEX_DUOFERN_CODE, $duoFernCode)) {
             return false;
@@ -74,7 +75,7 @@ class DuoFernMessage
         }
 
         // check valid msg
-        if (!preg_match(DuoFernRegex::DUOFERN_REGEX_MSG, $msg)) {
+        if (!preg_match(DuoFernRegex::DUOFERN_REGEX_MSG_WILDCHARS, $msg)) {
             return false;
         }
 

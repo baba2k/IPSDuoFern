@@ -14,6 +14,9 @@ class DuoFernRegex
     // valid duo fern msg
     const DUOFERN_REGEX_MSG = "/^[0-9A-F]{44}$/";
 
+    // valid duo fern msg
+    const DUOFERN_REGEX_MSG_WILDCHARS = "/^[0-9A-F\\.]{44}$/";
+
     // valid ack msg
     const DUOFERN_REGEX_ACK = "/^81[0-9A-F]{42}$/";
 

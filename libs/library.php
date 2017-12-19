@@ -154,6 +154,11 @@ class DuoFernWaitForMsgBuffer
      */
     public function WaitFor($msg)
     {
+        // check valid msg
+        if (!preg_match(DuoFernRegex::DUOFERN_REGEX_MSG_WILDCHARS, $msg)) {
+            return false;
+        }
+
         foreach ($this->items as $key => $item) {
             if (preg_match('/^' . $item['msg'] . '$/', $msg) && $item['received'] == true) { // received
                 unset ($this->items[$key]);
