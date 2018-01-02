@@ -7,7 +7,20 @@
       "Instance is inactive": "Instanz ist inaktiv",
       "Invalid DuoFern code (Format: XXXXXX with X = 0-9, A-F)": "DuoFern Code ist ungültig (Format: XXXXXX mit X = 0-9, A-F)",
       "Device is not available": "Gerät ist nicht erreichbar",
-      "Message could not be sent": "Nachricht konnte nicht gesendet werden"
+      "Message could not be sent": "Nachricht konnte nicht gesendet werden",
+      "Value could not be written": "Wert konnte nicht geschrieben werden",
+      "Value is not boolean": "Wert ist nicht vom Typ boolean",
+      "Value is not integer": "Wert ist nicht vom Typ integer",
+      "Value is not float": "Wert ist nicht vom Typ float",
+      "Value is not string": "Wert ist nicht vom Typ string",
+      "This device type is not supported": "Dieser Gerätetyp wird nicht unterstützt",
+      "Start remote pair": "Fernanmelden starten",
+      "Stop remote pair/unpair": "Fernan-/abmelden stoppen",
+      "Start remote unpair": "Fernabmelden starten",
+      "Reset": "Reset",
+      "Full reset": "Vollst. Reset",
+      "Product name: %s": "Produkt Name: %s",
+      "Version: %s": "Version: %s"
     }
   }
 }

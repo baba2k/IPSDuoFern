@@ -1,9 +1,50 @@
 {
   "elements": [
     {
+      "type": "Label",
+      "label": "This device type is not supported"
+    },
+    {
+      "type": "Button",
+      "label": "Start remote pair",
+      "onClick": "DUOFERN_WriteValueBoolean($id, 'REMOTE_PAIR', true)"
+    },
+    {
+      "type": "Button",
+      "label": "Stop remote pair/unpair",
+      "onClick": "DUOFERN_WriteValueBoolean($id, 'REMOTE_PAIR', false)"
+    },
+    {
+      "type": "Button",
+      "label": "Start remote unpair",
+      "onClick": "DUOFERN_WriteValueBoolean($id, 'REMOTE_UNPAIR', true)"
+    },
+    {
+      "type": "Button",
+      "label": "Reset",
+      "onClick": "DUOFERN_WriteValueBoolean($id, 'RESET_DEVICE', true)"
+    },
+    {
+      "type": "Button",
+      "label": "Full reset",
+      "onClick": "DUOFERN_WriteValueBoolean($id, 'FULL_RESET_DEVICE', true)"
+    },
+    {
+      "type": "Label",
+      "label": "\n"
+    },
+    {
+      "type": "Label",
+      "label": "Product name: %s"
+    },
+    {
       "type": "ValidationTextBox",
       "name": "duoFernCode",
       "caption": "DuoFern Code"
+    },
+    {
+      "type": "Label",
+      "label": "Version: %s"
     }
   ],
   "status": [

@@ -145,8 +145,7 @@ class DuoFernConfigurator extends IPSModule
             }
 
             $duoFernCode = IPS_GetProperty($instanceId, "duoFernCode");
-            $deviceTypeCode = substr($duoFernCode, 0, 2);
-            $deviceType = DuoFernDeviceType::getDeviceType($deviceTypeCode);
+            $deviceType = DuoFernDeviceType::getDeviceType($duoFernCode);
             $timeStamp = isset ($seenDevicesBuffer[$duoFernCode]) ? $seenDevicesBuffer[$duoFernCode] : null;
             $timeString = date('Ymd') == date('Ymd', $timeStamp) && $timeStamp != null ?
                 date('H:i:s', $timeStamp) : date('d.m.Y H:i:s', $timeStamp);
@@ -170,8 +169,7 @@ class DuoFernConfigurator extends IPSModule
                 continue;
             }
 
-            $deviceTypeCode = substr($duoFernCode, 0, 2);
-            $deviceType = DuoFernDeviceType::getDeviceType($deviceTypeCode);
+            $deviceType = DuoFernDeviceType::getDeviceType($duoFernCode);
             $timeStamp = isset ($seenDevicesBuffer[$duoFernCode]) ? $seenDevicesBuffer[$duoFernCode] : null;
             $timeString = date('Ymd') == date('Ymd', $timeStamp) && $timeStamp != null ?
                 date('H:i:s', $timeStamp) : date('d.m.Y H:i:s', $timeStamp);

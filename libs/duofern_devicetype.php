@@ -40,11 +40,13 @@ class DuoFernDeviceType
 
     public static function getDeviceType($deviceTypeCode)
     {
+        $deviceTypeCode = substr($deviceTypeCode, 0, 2);
         return isset(self::$duoFernDeviceTypes[$deviceTypeCode]) ? self::$duoFernDeviceTypes[$deviceTypeCode]['name'] : null;
     }
 
     public static function getDeviceGroup($deviceTypeCode)
     {
+        $deviceTypeCode = substr($deviceTypeCode, 0, 2);
         return isset(self::$duoFernDeviceTypes[$deviceTypeCode]) ? self::$duoFernDeviceTypes[$deviceTypeCode]['devGroup'] : null;
     }
 }

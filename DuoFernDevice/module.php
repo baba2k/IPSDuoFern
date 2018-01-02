@@ -40,6 +40,8 @@ class DuoFernDevice extends IPSModule
 
         // create buffers
         $this->PairTableNumberBuffer = "FF";
+        $this->DeviceGroupBuffer = null;
+        $this->VersionBuffer = null;
     }
 
     /**
@@ -51,6 +53,7 @@ class DuoFernDevice extends IPSModule
         // register messages
         $this->RegisterMessage(0, IPS_KERNELSTARTED);
         $this->RegisterMessage($this->InstanceID, FM_CONNECT);
+        $this->RegisterMessage($this->InstanceID, IM_CHANGESETTINGS);
 
         // call parent
         parent::ApplyChanges();
@@ -65,6 +68,11 @@ class DuoFernDevice extends IPSModule
 
         // property duoFernCode
         $duoFernCode = $this->ReadPropertyString("duoFernCode");
+
+        // set device group
+        $this->DeviceGroupBuffer = DuoFernDeviceType::getDeviceGroup($duoFernCode);
+
+        // set instance status
         if (!preg_match(DuoFernRegex::DUOFERN_REGEX_DUOFERN_CODE, $duoFernCode)) {
             $this->SetStatus(self::IS_INVALID_DUOFERN_CODE);
             $duoFernCode = "XXXXXX"; // set invalid duoFernCode for receive data filter
@@ -99,6 +107,13 @@ class DuoFernDevice extends IPSModule
 
         // send msg as debug msg
         $this->SendDebug("RECEIVED", $msg, 1);
+
+        $displayMsg = $this->ConvertMsgToDisplay($msg);
+
+        // handle status msg
+        if (preg_match('/^' . substr(DuoFernMessage::DUOFERN_MSG_STATUS, 0, 6) . '.{38}$/', $displayMsg)) {
+            $this->VersionBuffer = (string)substr($displayMsg, 24, 1) . "." . (string)substr($displayMsg, 25, 1);
+        }
 
         // set status to active
         $this->SetStatus(IS_ACTIVE);
@@ -155,6 +170,44 @@ class DuoFernDevice extends IPSModule
     }
 
     /**
+     * Sets dynamic configuration form for device list
+     *
+     * @return string configuration json string
+     */
+    public function GetConfigurationForm()
+    {
+        $data = json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . "form.json"), true);
+
+        // slice not needed elements
+        switch ($this->DeviceGroupBuffer) {
+            case 22:
+                array_splice($data['elements'], 0, 1);
+                break;
+            default: // not supported device
+                array_splice($data['elements'], 1, count($data['elements']) - 5);
+                break;
+        }
+
+        // set product name
+        $duoFernCode = $this->ReadPropertyString("duoFernCode");
+        $productName = DuoFernDeviceType::getDeviceType($duoFernCode);
+        if ($productName !== null) {
+            $data['elements'][count($data['elements']) - 3]['label'] = sprintf($this->Translate("Product name: %s"), $productName);
+        } else {
+            array_splice($data['elements'], count($data['elements']) - 3, 1);
+        }
+
+        // set version
+        if ($this->VersionBuffer !== null && $this->GetStatus()) {
+            $data['elements'][count($data['elements']) - 1]['label'] = sprintf($this->Translate("Version: %s"), $this->VersionBuffer);
+        } else {
+            array_splice($data['elements'], count($data['elements']) - 1, 1);
+        }
+
+        return json_encode($data);
+    }
+
+    /**
      * Handles registered messages
      * Will be called when receiving a registered msg
      *
@@ -171,6 +224,17 @@ class DuoFernDevice extends IPSModule
                 break;
             case FM_CONNECT :
                 $this->SendUpdateChildrenData();
+                break;
+            case IM_CHANGESETTINGS :
+                // check changed properties
+                foreach ($Data as $changedPropertyJson) {
+                    $changedProperty = json_decode($changedPropertyJson, true);
+                    // if property duoFernCode is changed
+                    if (is_array($changedProperty) && array_key_exists("duoFernCode", $changedProperty)) {
+                        $this->VersionBuffer = null; // reset version buffer
+                        break;
+                    }
+                }
                 break;
         }
     }
