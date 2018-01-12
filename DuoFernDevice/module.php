@@ -42,6 +42,7 @@ class DuoFernDevice extends IPSModule
         $this->PairTableNumberBuffer = "FF";
         $this->DeviceGroupBuffer = null;
         $this->VersionBuffer = null;
+        $this->WaitForMsgBuffer = new DuoFernWaitForMsgBuffer();
     }
 
     /**
@@ -109,6 +110,11 @@ class DuoFernDevice extends IPSModule
         $this->SendDebug("RECEIVED", $msg, 1);
 
         $displayMsg = $this->ConvertMsgToDisplay($msg);
+
+        // wait for msg buffer
+        $waitForMsgBuffer = $this->WaitForMsgBuffer;
+        $waitForMsgBuffer->Received($displayMsg);
+        $this->WaitForMsgBuffer = $waitForMsgBuffer;
 
         // handle status msg
         if (preg_match('/^' . substr(DuoFernMessage::DUOFERN_MSG_STATUS, 0, 6) . '.{38}$/', $displayMsg)) {
