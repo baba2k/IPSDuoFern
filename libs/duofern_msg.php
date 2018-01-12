@@ -108,7 +108,7 @@ class DuoFernMessage
      * @param $msg
      *              message in hex string in format /^[0-9A-F]{44}$/
      * @param $duoFernCode
-     *              fern codes in format /^[0-9A-F]{6}$/
+     *              duo fern code in format /^[0-9A-F]{6}$/
      * @return bool|string generated response message
      */
     public static function GenerateResponse($msg, $duoFernCode)
@@ -129,7 +129,12 @@ class DuoFernMessage
             case preg_match('/^' . substr(DuoFernMessage::DUOFERN_MSG_REMOTE_PAIR, 0, 8) . '.{36}$/', $msg) ? $msg : !$msg:
                 $generatedResponse = "81000000" . substr($msg, 8);
                 break;
-            default :
+            // command 0D 01 *
+            case preg_match('/^' . substr(DuoFernMessage::DUOFERN_MSG_PING, 0, 4) . '.{40}$/', $msg) ? $msg : !$msg:
+                $generatedResponse = "810003CC" . substr($msg, 8);
+                $generatedResponse = substr_replace($generatedResponse, $duoFernCode, 30, 6);
+                break;
+            default:
                 $generatedResponse = "81" . substr($msg, 2);
         }
         return $generatedResponse;

@@ -286,7 +286,7 @@ trait PrivateFunction
     private function UpdateParentData()
     {
         $oldParentId = $this->ParentInstanceID;
-        $parentId = IPS_GetInstance($this->InstanceID) ['ConnectionID'];
+        $parentId = IPS_GetInstance($this->InstanceID)['ConnectionID'];
 
         // no parent change
         if ($parentId == $oldParentId) {

@@ -51,7 +51,7 @@ trait IPSHelpFunction
      */
     private function GetStatus()
     {
-        return IPS_GetInstance($this->InstanceID) ['InstanceStatus'];
+        return IPS_GetInstance($this->InstanceID)['InstanceStatus'];
     }
 
     /**
@@ -72,7 +72,7 @@ trait IPSHelpFunction
      */
     private function IsInstanceActive()
     {
-        return IPS_GetInstance($this->InstanceID) ['InstanceStatus'] == IS_ACTIVE ? true : false;
+        return IPS_GetInstance($this->InstanceID)['InstanceStatus'] == IS_ACTIVE ? true : false;
     }
 
     /**
@@ -83,9 +83,9 @@ trait IPSHelpFunction
     private function IsParentInstanceActive()
     {
         $instance = IPS_GetInstance($this->InstanceID);
-        if ($instance ['ConnectionID'] > 0) {
-            $parent = IPS_GetInstance($instance ['ConnectionID']);
-            if ($parent ['InstanceStatus'] == IS_ACTIVE) {
+        if ($instance['ConnectionID'] > 0) {
+            $parent = IPS_GetInstance($instance['ConnectionID']);
+            if ($parent['InstanceStatus'] == IS_ACTIVE) {
                 return true;
             }
         }
@@ -102,7 +102,7 @@ trait IPSHelpFunction
     private function SemaphoreEnter($name)
     {
         for ($i = 0; $i < 500; $i++) {
-            if (IPS_SemaphoreEnter(( string )$name . "_" . ( string )$this->InstanceID, 1)) {
+            if (IPS_SemaphoreEnter((string)$name . "_" . (string)$this->InstanceID, 1)) {
                 return true;
             } else {
                 IPS_Sleep(mt_rand(1, 5));
@@ -120,7 +120,7 @@ trait IPSHelpFunction
      */
     private function SemaphoreLeave($name)
     {
-        return IPS_SemaphoreLeave(( string )$name . "_" . ( string )$this->InstanceID);
+        return IPS_SemaphoreLeave((string)$name . "_" . (string)$this->InstanceID);
     }
 }
 
