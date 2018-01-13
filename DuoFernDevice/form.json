@@ -5,6 +5,69 @@
       "label": "This device type is not supported"
     },
     {
+      "type": "CheckBox",
+      "name": "status",
+      "caption": "Emulate status"
+    },
+    {
+      "type": "Label",
+      "label": "\n"
+    },
+    {
+      "type": "Label",
+      "label": "Product name: %s"
+    },
+    {
+      "type": "ValidationTextBox",
+      "name": "duoFernCode",
+      "caption": "DuoFern Code"
+    },
+    {
+      "type": "Label",
+      "label": "Version: %s"
+    }
+  ],
+  "actions": [
+    {
+      "type": "CheckBox",
+      "name": "staircaseFunction",
+      "caption": "Staircase function"
+    },
+    {
+      "type": "Button",
+      "label": "Save staircase function",
+      "onClick": ""
+    },
+    {
+      "type": "NumberSpinner",
+      "name": "staircaseFunctionTime",
+      "caption": "\t100 ms *",
+      "digits": 0
+    },
+    {
+      "type": "Button",
+      "label": "Save staircase func. time",
+      "onClick": ""
+    },
+    {
+      "type": "Label",
+      "label": "\n"
+    },
+    {
+      "type": "CheckBox",
+      "name": "modeChange",
+      "caption": "Mode change"
+    },
+    {
+      "type": "Button",
+      "label": "Save mode change",
+      "onClick": ""
+    },
+    {
+      "type": "Label",
+      "label": "\n"
+    },
+    {
       "type": "Button",
       "label": "Start remote pair",
       "onClick": "DUOFERN_WriteValueBoolean($id, 'REMOTE_PAIR', true)"
@@ -28,23 +91,6 @@
       "type": "Button",
       "label": "Full reset",
       "onClick": "DUOFERN_WriteValueBoolean($id, 'FULL_RESET_DEVICE', true)"
-    },
-    {
-      "type": "Label",
-      "label": "\n"
-    },
-    {
-      "type": "Label",
-      "label": "Product name: %s"
-    },
-    {
-      "type": "ValidationTextBox",
-      "name": "duoFernCode",
-      "caption": "DuoFern Code"
-    },
-    {
-      "type": "Label",
-      "label": "Version: %s"
     }
   ],
   "status": [

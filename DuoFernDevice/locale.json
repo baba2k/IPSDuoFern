@@ -20,7 +20,14 @@
       "Reset": "Reset",
       "Full reset": "Vollst. Reset",
       "Product name: %s": "Produkt Name: %s",
-      "Version: %s": "Version: %s"
+      "Version: %s": "Version: %s",
+      "Mode change": "Moduswechsel",
+      "Staircase function": "Treppenhausfunktion",
+      "Emulate status": "Status emulieren",
+      "Seconds": "Sekunden",
+      "Save staircase function": "Treppenhausfunktion speichern",
+      "Save staircase func. time": "Treppenhausfktszeit speichern",
+      "Save mode change": "Moduswechsel speichern"
     }
   }
 }

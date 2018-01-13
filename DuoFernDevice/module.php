@@ -37,6 +37,7 @@ class DuoFernDevice extends IPSModule
 
         // register properties
         $this->RegisterPropertyString("duoFernCode", "XXXXXX");
+        $this->RegisterPropertyBoolean("status", true);
 
         // create buffers
         $this->PairTableNumberBuffer = "FF";
@@ -191,6 +192,7 @@ class DuoFernDevice extends IPSModule
                 break;
             default: // not supported device
                 array_splice($data['elements'], 1, count($data['elements']) - 5);
+                unset($data['actions']);
                 break;
         }
 

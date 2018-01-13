@@ -51,6 +51,7 @@ class DuoFernGateway extends IPSModule
         $this->WaitForResponseBuffer = new DuoFernWaitForResponseBuffer();
         $this->ParentInstanceID = "";
         $this->ChildrenInstanceIDs = array();
+        $this->DeviceDuoFernCodes = array();
     }
 
     /**
@@ -206,7 +207,7 @@ class DuoFernGateway extends IPSModule
     protected function SendDataToParent($Data)
     {
         // discard if instance inactive or no active parent
-        if ((!$this->IsInstanceActive() && $this->GetStatus() != self::IS_INIT_PENDING) || !$this->IsParentInstanceActive() ) {
+        if ((!$this->IsInstanceActive() && $this->GetStatus() != self::IS_INIT_PENDING) || !$this->IsParentInstanceActive()) {
             $this->SendDebug("DISCARD TRANSMIT", $Data, 1);
             IPS_SemaphoreLeave('DUOFERN_SendMsg');
             trigger_error($this->Translate("Message could not be sent") . PHP_EOL, E_USER_ERROR);
@@ -268,11 +269,19 @@ class DuoFernGateway extends IPSModule
                     // if property duoFernCode is changed
                     if (is_array($changedProperty) && array_key_exists("duoFernCode", $changedProperty)) {
                         $duoFernCode = $changedProperty["duoFernCode"];
+
                         // valid duo fern code
-                        if (preg_match(DuoFernRegex::DUOFERN_REGEX_DUOFERN_CODE, $duoFernCode)) {
-                            $this->ForceRefresh();
+                        if (!preg_match(DuoFernRegex::DUOFERN_REGEX_DUOFERN_CODE, $duoFernCode)) {
                             break;
                         }
+
+                        // no new duo fern code
+                        if (in_array($duoFernCode, (array)$this->DeviceDuoFernCodes)) {
+                            break;
+                        }
+
+                        // force refresh
+                        $this->ForceRefresh();
                     }
                 }
                 break;

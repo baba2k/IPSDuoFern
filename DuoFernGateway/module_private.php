@@ -22,7 +22,7 @@ trait PrivateFunction
         $gatewayDuoFernCode = $this->ReadPropertyString('duoFernCode');
 
         // get device duo fern codes
-        $deviceDuoFernCodes = $this->GetDeviceDuoFernCodes();
+        $deviceDuoFernCodes = $this->DeviceDuoFernCodes;
 
         for ($i = 0; $i < $retry; $i++) {
             $this->SendDebug("INIT START", $this->ConvertMsgToSend("00000000000000000000000000000000000000000000"), 1);
@@ -365,12 +365,15 @@ trait PrivateFunction
         // update children data and register/unregister msgs
         $this->UpdateChildrenData();
 
+        // update device duo fern codes
+        $this->DeviceDuoFernCodes = $this->GetDeviceDuoFernCodes();
+
         // update parent data and register/unregister msgs
         if ($this->UpdateParentData() != 0 && $this->IsInstanceActive() && $this->IsParentInstanceActive()) {
             // initiates the duo fern connection
             $this->Init();
         } else {
-            $this->ResetPairTableNumbersOnDevices($this->GetDeviceDuoFernCodes());
+            $this->ResetPairTableNumbersOnDevices($this->DeviceDuoFernCodes);
         }
     }
 
