@@ -13,6 +13,9 @@ class DuoFernMessage
     // zzzzzz = sender duo fern code
     // xxxxxx = receiver duo fern code
     // yy = pair table number e.g. hex number like FF
+    // cccc = stair case function (0001-FE81). if stair case function is on (cccc >= 8000)
+    // then cccc - 8000 = stair case function time else if (cccc < 8000) then cccc = stair case function time
+    // ss = state and mode change e.g. devGroup 22: 64 actor on and mode change off, 80 actor off and mode change on + E4 actor on and mode change on
 
     // ACK
     const DUOFERN_MSG_ACK = "81000000000000000000000000000000000000000000";
@@ -28,7 +31,7 @@ class DuoFernMessage
     // device status
     const DUOFERN_MSG_GET_ALL_DEVICES_STATUS = "0DFF0F400000000000000000000000000000FFFFFF01";
     const DUOFERN_MSG_GET_DEVICE_STATUS = "0DFF0F400000000000000000000000000000xxxxxx01";
-    const DUOFERN_MSG_STATUS = "0FFF0Fggdd00aaaaaaaaaaaavv00yyzzzzzzxxxxxx01";
+    const DUOFERN_MSG_STATUS = "0FFF0Fggdd00aaaaccccaassvv00yyzzzzzzxxxxxx01";
 
     // pairing
     const DUOFERN_MSG_PAIR_START = "04000000000000000000000000000000000000000000";
@@ -66,6 +69,12 @@ class DuoFernMessage
     const DUOFERN_MSG_RESET_DEVICE = "0D010815CB000000000000000000yy000000xxxxxx00";
     const DUOFERN_MSG_FULL_RESET_DEVICE = "0D010815CC000000000000000000yy000000xxxxxx00";
     const DUOFERN_MSG_PING = "0D01071600000000000000000000yy000000xxxxxx00";
+    const DUOFERN_MSG_STATE_ON ="0D010E0300000000000000000000yy000000xxxxxx00";
+    const DUOFERN_MSG_STATE_OFF ="0D010E0200000000000000000000yy000000xxxxxx00";
+    const DUOFERN_MSG_MODE_CHANGE ="0D01070C00000000000000000000yy000000xxxxxx00";
+    const DUOFERN_MSG_STAIRCASE_FUNCTION_ON ="0D01081400FD0000000000000000yy000000xxxxxx00";
+    const DUOFERN_MSG_STAIRCASE_FUNCTION_OFF ="0D01081400FE0000000000000000yy000000xxxxxx00";
+    const DUOFERN_MSG_STAIRCASE_FUNCTION_TIME ="0D0108140000tttt000000000000yy000000xxxxxx00"; // tttt = 0001 (1)decimal to 7E81 (32385)decimal
 
     /**
      * Generates a msg
